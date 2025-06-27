@@ -1,0 +1,33 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Category;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Book>
+ */
+class BookFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        $category = Category::all()->toArray();
+
+        return [
+            //
+            'title' => fake()->jobTitle(),
+            'author' => fake()->firstName() . " " . fake()->lastName(),
+            'description' => fake()->paragraph(1),
+            'category_id' => $category[random_int(0, count($category)-1)]['id'],
+            'notes' => fake()->paragraph(1),
+            'is_available' => fake()->boolean(70),
+            'book_img' => fake()->imageUrl()
+        ];
+    }
+}
