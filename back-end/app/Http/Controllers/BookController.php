@@ -22,7 +22,7 @@ class BookController extends Controller
     public function store(Request $request)
     {
         //
-        dd(env('APP_URL_APP'));
+        dd(env('FRONT_END_URL'));
     }
 
     /**
