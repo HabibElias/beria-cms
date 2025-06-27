@@ -7,6 +7,7 @@ import { BookOpen, LayoutDashboard, Users, Calendar, BarChart3, Settings, Menu, 
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { cn } from "@/lib/utils"
+import { UserMenu } from "@/components/user-menu"
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -134,6 +135,9 @@ function SidebarContent({ pathname }: { pathname: string }) {
       </div>
 
       <div className="px-4 py-4 border-t">
+        <div className="flex items-center justify-between mb-3">
+          <UserMenu />
+        </div>
         <div className="text-xs text-muted-foreground">
           <p className="font-medium">Grace Community Church</p>
           <p>Library Management System</p>
