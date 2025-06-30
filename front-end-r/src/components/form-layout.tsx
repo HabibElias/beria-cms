@@ -3,15 +3,15 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "./auth-guard";
 import { Loader2Icon } from "lucide-react";
 
-const ProtectedRoutes = () => {
+const FormLayout = () => {
   const { user, fetchState } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (fetchState === "ready") {
-      if (!user) navigate("/login");
+      if (user) navigate("/");
     }
-  }, [user, fetchState === "notReady"]);
+  }, [user]);
 
   if (fetchState === "notReady")
     return (
@@ -19,12 +19,7 @@ const ProtectedRoutes = () => {
         <Loader2Icon className="animate-spin" />
       </div>
     );
-
-  return (
-    <div>
-      <Outlet />
-    </div>
-  );
+  return <Outlet />;
 };
 
-export default ProtectedRoutes;
+export default FormLayout;

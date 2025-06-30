@@ -55,7 +55,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     const savedToken = localStorage.getItem("auth_token");
     console.log("Initializing Token from localStorage:", savedToken);
     if (savedToken) {
-      apiClient.defaults.headers.common["Authorization"] = `Bearer ${savedToken}`;
+      apiClient.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${savedToken}`;
     } else {
       delete apiClient.defaults.headers.common["Authorization"];
     }
@@ -83,7 +85,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
           style: { display: "flex", alignItems: "center", gap: "1rem" },
         });
       } else {
-        toast(response.data.message || "Login failed");
+        toast.error(response.data.message || "Login failed");
       }
     } catch (e) {
       console.error(e);

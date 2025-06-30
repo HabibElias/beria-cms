@@ -13,7 +13,7 @@ class BookController extends Controller
     public function index()
     {
         //
-        return Book::paginate('10');
+        return Book::with('category')->paginate('10');
     }
 
     /**

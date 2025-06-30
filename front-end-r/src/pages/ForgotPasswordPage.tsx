@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
             <div className="flex justify-center items-center mb-6">
               <BookOpen className="h-12 w-12 text-blue-600 dark:text-blue-400" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Church Library</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Berea CMS</h2>
             <div className="mt-4 flex justify-center">
               <ThemeToggle />
             </div>
@@ -107,7 +107,7 @@ export default function ForgotPasswordPage() {
           {/* Footer */}
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              © 2024 Grace Community Church. All rights reserved.
+              © 2024 Berea Church. All rights reserved.
             </p>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function ForgotPasswordPage() {
           <div className="flex justify-center items-center mb-6">
             <BookOpen className="h-12 w-12 text-blue-600 dark:text-blue-400" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Church Library</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Berea-CMS</h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Reset your password to regain access</p>
           <div className="mt-4 flex justify-center">
             <ThemeToggle />
@@ -201,7 +201,7 @@ export default function ForgotPasswordPage() {
         {/* Footer */}
         <div className="text-center">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            © 2024 Grace Community Church. All rights reserved.
+            © 2024 Berea Church. All rights reserved.
           </p>
         </div>
       </div>

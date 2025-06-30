@@ -1,11 +1,21 @@
-
-import { useState } from "react"
-import { BookOpen, LayoutDashboard, Users, Calendar, BarChart3, Settings, Menu, X, Plus, Search } from "lucide-react"
-import { Button } from "../components/ui/button"
-import { ThemeToggle } from "../components/theme-toggle"
-import { cn } from "../lib/utils"
-import { UserMenu } from "../components/user-menu"
-import { Link, useLocation } from "react-router-dom"
+import { useState } from "react";
+import {
+  BookOpen,
+  LayoutDashboard,
+  Users,
+  Calendar,
+  BarChart3,
+  Settings,
+  Menu,
+  X,
+  Plus,
+  Search,
+} from "lucide-react";
+import { Button } from "../components/ui/button";
+import { ThemeToggle } from "../components/theme-toggle";
+import { cn } from "../lib/utils";
+import { UserMenu } from "../components/user-menu";
+import { Link, useLocation } from "react-router-dom";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -14,38 +24,45 @@ const navigation = [
   { name: "Check-outs", href: "/checkouts", icon: Calendar },
   { name: "Reports", href: "/reports", icon: BarChart3 },
   { name: "Settings", href: "/settings", icon: Settings },
-]
+];
 
 const quickActions = [
   { name: "Add Book", href: "/books/add", icon: Plus },
   { name: "New Checkout", href: "/checkouts/new", icon: Calendar },
   { name: "Find Member", href: "/members", icon: Search },
-]
+];
 
 export function Sidebar() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const pathname = useLocation()
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = useLocation();
 
   return (
     <>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
       {/* Mobile sidebar */}
       <div
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-64 bg-background border-r shadow-lg transform transition-transform duration-300 ease-in-out lg:hidden",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex items-center justify-between h-16 px-4 border-b">
           <div className="flex items-center">
             <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-            <span className="ml-2 text-lg font-semibold">Church Library</span>
+            <span className="ml-2 text-lg font-semibold">Berea-CMS</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarOpen(false)}
+          >
             <X className="h-5 w-5" />
           </Button>
         </div>
@@ -58,7 +75,7 @@ export function Sidebar() {
           <div className="flex items-center justify-between h-16 px-4 border-b">
             <div className="flex items-center">
               <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-              <span className="ml-2 text-lg font-semibold">Church Library</span>
+              <span className="ml-2 text-lg font-semibold">Berea-CMS</span>
             </div>
             <ThemeToggle />
           </div>
@@ -69,18 +86,22 @@ export function Sidebar() {
       {/* Mobile menu button */}
       <div className="lg:hidden">
         <div className="flex items-center justify-between h-16 px-4 bg-background border-b shadow-sm">
-          <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(true)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarOpen(true)}
+          >
             <Menu className="h-5 w-5" />
           </Button>
           <div className="flex items-center">
             <BookOpen className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            <span className="ml-2 text-lg font-semibold">Church Library</span>
+            <span className="ml-2 text-lg font-semibold">Berea-CMS</span>
           </div>
           <ThemeToggle />
         </div>
       </div>
     </>
-  )
+  );
 }
 
 function SidebarContent({ pathname }: { pathname: string }) {
@@ -88,7 +109,9 @@ function SidebarContent({ pathname }: { pathname: string }) {
     <div className="flex flex-col flex-1 overflow-y-auto">
       <nav className="flex-1 px-2 py-4 space-y-1">
         {navigation.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/" && pathname.startsWith(item.href));
           return (
             <Link
               key={item.name}
@@ -97,7 +120,7 @@ function SidebarContent({ pathname }: { pathname: string }) {
                 "group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors",
                 isActive
                   ? "bg-blue-100 text-blue-900 dark:bg-blue-900/20 dark:text-blue-100"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               )}
             >
               <item.icon
@@ -105,12 +128,12 @@ function SidebarContent({ pathname }: { pathname: string }) {
                   "mr-3 h-5 w-5 flex-shrink-0",
                   isActive
                     ? "text-blue-500 dark:text-blue-400"
-                    : "text-muted-foreground group-hover:text-accent-foreground",
+                    : "text-muted-foreground group-hover:text-accent-foreground"
                 )}
               />
               {item.name}
             </Link>
-          )
+          );
         })}
       </nav>
 
@@ -137,10 +160,10 @@ function SidebarContent({ pathname }: { pathname: string }) {
           <UserMenu />
         </div>
         <div className="text-xs text-muted-foreground">
-          <p className="font-medium">Grace Community Church</p>
-          <p>Library Management System</p>
+          <p className="font-medium">Berea Church</p>
+          <p>Community Management System</p>
         </div>
       </div>
     </div>
-  )
+  );
 }

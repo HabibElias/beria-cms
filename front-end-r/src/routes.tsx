@@ -11,6 +11,7 @@ import ReportsPage from "./pages/ReportsPage";
 import Layout from "./components/layout";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import ErrorPage from "./components/error-page";
+import FormLayout from "./components/form-layout";
 
 const routes = createBrowserRouter([
   {
@@ -49,16 +50,22 @@ const routes = createBrowserRouter([
     ],
   },
   {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/logout",
-    element: <LogoutPage />,
-  },
-  {
-    path: "/forgot-password",
-    element: <ForgotPasswordPage />,
+    element: <FormLayout />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "/login",
+        element: <LoginPage />,
+      },
+      {
+        path: "/logout",
+        element: <LogoutPage />,
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPasswordPage />,
+      },
+    ],
   },
 ]);
 

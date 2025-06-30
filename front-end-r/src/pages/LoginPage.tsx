@@ -59,7 +59,7 @@ export default function LoginPage() {
             <BookOpen className="h-12 w-12 text-blue-600 dark:text-blue-400" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Church Library
+            Berea-CMS
           </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Sign in to your library management account
@@ -190,7 +190,7 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="text-center">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            © 2024 Grace Community Church. All rights reserved.
+            © 2024  Berea Church. All rights reserved.
           </p>
         </div>
       </div>

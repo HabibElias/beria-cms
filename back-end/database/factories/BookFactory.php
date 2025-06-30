@@ -24,8 +24,11 @@ class BookFactory extends Factory
             'title' => fake()->jobTitle(),
             'author' => fake()->firstName() . " " . fake()->lastName(),
             'description' => fake()->paragraph(1),
-            'category_id' => $category[random_int(0, count($category)-1)]['id'],
+            'category_id' => $category[random_int(0, count($category) - 1)]['id'],
             'notes' => fake()->paragraph(1),
+            'condition' => ['excellent', 'good', 'bad'][random_int(0, 2)],
+            'location' => strtoupper(fake()->randomLetter()) . "-" . fake()->randomDigit(),
+            'pages' => fake()->numberBetween(100, 500),
             'is_available' => fake()->boolean(70),
             'book_img' => fake()->imageUrl()
         ];

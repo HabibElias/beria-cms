@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react"
-import { User, LogOut, Settings, ChevronDown } from "lucide-react"
-import { Button } from "../components/ui/button"
+import { User, LogOut, Settings, ChevronDown } from "lucide-react";
+import { Button } from "../components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,17 +7,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "../components/ui/avatar"
-import { Link } from "react-router-dom"
+} from "../components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "../components/ui/avatar";
+import { Link } from "react-router-dom";
+import { useAuth } from "./auth-guard";
 
 export function UserMenu() {
-  const [userEmail, setUserEmail] = useState<string>("")
-
-  useEffect(() => {
-    const email = localStorage.getItem("userEmail") || ""
-    setUserEmail(email)
-  }, [])
+  const { user, logout } = useAuth();
 
   const getInitials = (email: string) => {
     return email
@@ -26,25 +21,34 @@ export function UserMenu() {
       .split(".")
       .map((part) => part.charAt(0).toUpperCase())
       .join("")
-      .slice(0, 2)
-  }
+      .slice(0, 2);
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex items-center space-x-2 h-8 px-2">
+        <Button
+          variant="ghost"
+          className="flex items-center space-x-2 h-8 p-6"
+        >
           <Avatar className="h-6 w-6">
-            <AvatarFallback className="text-xs">{getInitials(userEmail)}</AvatarFallback>
+            <AvatarFallback className="text-xs">
+              {getInitials(user?.email ?? "")}
+            </AvatarFallback>
           </Avatar>
-          <span className="text-sm hidden sm:inline-block max-w-24 truncate">{userEmail.split("@")[0]}</span>
+          <span className="text-sm hidden sm:inline-block max-w-24 truncate">
+            {user?.email?.split("@")[0] ?? ""}
+          </span>
           <ChevronDown className="h-3 w-3" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-56 ml-4">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium">Signed in as</p>
-            <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {user?.email ?? ""}
+            </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -62,12 +66,15 @@ export function UserMenu() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link to="/logout" className="flex items-center text-red-600 dark:text-red-400">
+          <button
+            onClick={logout}
+            className="flex items-center w-full cursor-pointer text-red-600 dark:text-red-400"
+          >
             <LogOut className="mr-2 h-4 w-4" />
             Sign Out
-          </Link>
+          </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

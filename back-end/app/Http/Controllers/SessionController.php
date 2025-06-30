@@ -58,7 +58,7 @@ class SessionController extends Controller
     {
         //
         if (!$token = JWTAuth::attempt($request->all())) {
-            return response()->json(['error' => 'Invalid Credentials'], 401);
+            return response()->json(['status' => false, 'message' => 'Invalid Credentials']);
         }
 
         return response()->json(['status' => true, 'user' => Auth::user(), 'token' => $token]);

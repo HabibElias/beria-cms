@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use App\Models\User;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        return response()->json(['status' => true, 'data' => Category::all()]);
+        $perPage = $request->query('perPage', 10);
+        $page = $request->query('page', 1);
+
+        return User::with('checkouts')->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -27,16 +29,15 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Category $category)
+    public function show(string $id)
     {
         //
-        return response()->json(['status' => true, 'data' => $category]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, string $id)
     {
         //
     }
@@ -44,7 +45,7 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Category $category)
+    public function destroy(string $id)
     {
         //
     }

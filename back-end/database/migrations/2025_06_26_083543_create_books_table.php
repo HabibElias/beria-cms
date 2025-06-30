@@ -17,9 +17,12 @@ return new class extends Migration
             $table->string('title');
             $table->string('author');
             $table->string('description');
-            $table->string('notes');
-            $table->foreignIdFor(Category::class);
+            $table->string('notes')->nullable();
+            $table->integer('pages');
+            $table->string('location');
+            $table->foreignIdFor(Category::class)->nullable();
             $table->boolean('is_available')->default(true);
+            $table->enum('condition', ['excellent', 'good', 'bad']);
             $table->string('book_img');
             $table->timestamps();
         });

@@ -1,11 +1,18 @@
-import { Search, Plus, Edit, Trash2, Mail, Phone } from "lucide-react"
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { Card, CardContent } from "../components/ui/card"
-import { Badge } from "../components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table"
-import { PageHeader } from "../components/page-header"
-import { Link } from "react-router-dom"
+import { Search, Plus, Edit, Trash2, Mail, Phone } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Card, CardContent } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
+import { PageHeader } from "../components/page-header";
+import { Link } from "react-router-dom";
 
 const members = [
   {
@@ -53,12 +60,15 @@ const members = [
     booksCheckedOut: 1,
     status: "Inactive",
   },
-]
+];
 
 export default function MembersPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Library Members" description="Manage your church library members">
+      <PageHeader
+        title="Library Members"
+        description="Manage your berea-cms members"
+      >
         <Button asChild>
           <Link to="/members/add">
             <Plus className="h-4 w-4 mr-2" />
@@ -73,7 +83,10 @@ export default function MembersPage() {
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input placeholder="Search members by name or email..." className="pl-10" />
+                <Input
+                  placeholder="Search members by name or email..."
+                  className="pl-10"
+                />
               </div>
             </div>
 
@@ -82,8 +95,12 @@ export default function MembersPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead className="hidden md:table-cell">Contact</TableHead>
-                    <TableHead className="hidden sm:table-cell">Member Since</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Contact
+                    </TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Member Since
+                    </TableHead>
                     <TableHead>Books Out</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
@@ -119,10 +136,18 @@ export default function MembersPage() {
                         {new Date(member.memberSince).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{member.booksCheckedOut}</Badge>
+                        <Badge variant="outline">
+                          {member.booksCheckedOut}
+                        </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={member.status === "Active" ? "default" : "secondary"}>{member.status}</Badge>
+                        <Badge
+                          variant={
+                            member.status === "Active" ? "default" : "secondary"
+                          }
+                        >
+                          {member.status}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
@@ -143,5 +168,5 @@ export default function MembersPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

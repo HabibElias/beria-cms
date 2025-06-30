@@ -1,12 +1,11 @@
 <?php
 
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SessionController;
 use Illuminate\Support\Facades\Route;
 
-// Public Routes
-
-// Protected Routes (JWT-protected)
+// books routes 
 Route::middleware(['auth'])->group(function () {
     Route::get('/books', [BookController::class, 'index']);
     Route::post('/books', [BookController::class, 'store']);
@@ -14,6 +13,11 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/books/{book}', [BookController::class, 'update']);
     Route::delete('/books/{book}', [BookController::class, 'destroy']);
 });
+
+// category routes
+Route::apiResource('categories', CategoryController::class)->middleware('auth');
+
+
 
 // auth
 
