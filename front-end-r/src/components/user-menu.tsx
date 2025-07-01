@@ -10,7 +10,7 @@ import {
 } from "../components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
 import { Link } from "react-router-dom";
-import { useAuth } from "./auth-guard";
+import { useAuth } from "../provider/AuthProvider";
 
 export function UserMenu() {
   const { user, logout } = useAuth();

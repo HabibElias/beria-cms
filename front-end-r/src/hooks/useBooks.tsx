@@ -1,27 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "../services/Apiclient";
+import type Book from "../models/Book";
 
-interface Book {
-  id: number;
-  title: string;
-  author: string;
-  category: Category;
-  is_available: boolean;
-  location: string;
-  dateAdded: string;
-  description: string;
-  pages: number;
-  publisher: string;
-  condition: string;
-  image: string;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
-
-interface FetchBooksResponse {
+export interface FetchBooksResponse {
   current_page: number;
   data: Book[];
   first_page_url: string;
@@ -37,16 +18,34 @@ interface FetchBooksResponse {
   total: number;
 }
 
-const useBooks = (page = 1, perPage = 10) => {
+const useBooks = ({
+  page,
+  title,
+  category,
+  status,
+}: {
+  page: number;
+  title?: string;
+  category?: string;
+  status?: string;
+}) => {
   const fetchBooks = () =>
     apiClient
-      .get<FetchBooksResponse>(`/books?page=${page}&perPage=${perPage}`)
+      .get<FetchBooksResponse>(
+        `/books?per_page=12&page=${page}&title=${title ?? ""}
+        &
+        ${category !== "all" && `category=${category ?? ""}`}
+        &
+        ${status !== "all" && `status=${status ?? ""}`}`
+      )
       .then((res) => {
+        console.log(res.data);
+
         return res.data;
       });
 
   return useQuery<FetchBooksResponse | undefined, Error>({
-    queryKey: ["books", page, perPage],
+    queryKey: ["books", page, title, category, status],
     queryFn: fetchBooks,
   });
 };

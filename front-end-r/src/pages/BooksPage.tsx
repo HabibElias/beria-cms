@@ -1,18 +1,13 @@
+import { BookOpen, Grid, List, Plus, Search } from "lucide-react";
 import { useState } from "react";
-import {
-  Search,
-  Plus,
-  Edit,
-  Trash2,
-  Grid,
-  List,
-  Eye,
-  BookOpen,
-} from "lucide-react";
+import { Link } from "react-router-dom";
+import BookCard, { BookSkeleton } from "../components/BooksPage/BookCard";
+import { columns } from "../components/BooksPage/column";
+import { DataTable } from "../components/BooksPage/data-table";
+import { PageHeader } from "../components/page-header";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
 import { Card, CardContent } from "../components/ui/card";
-import { Badge } from "../components/ui/badge";
+import { Input } from "../components/ui/input";
 import {
   Select,
   SelectContent,
@@ -20,45 +15,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../components/ui/table";
-import { PageHeader } from "../components/page-header";
+import { Skeleton } from "../components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
-import { Link } from "react-router-dom";
-import useCategories from "../hooks/useCategories";
 import useBooks from "../hooks/useBooks";
-
+import useCategories from "../hooks/useCategories";
+import useDebounce from "../hooks/useDebounce";
 type ViewMode = "table" | "cards";
 
 export default function BooksPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>("table");
+  const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
 
-  const { data: categories, error, isLoading: catIsLoading } = useCategories();
-  const { data: books, isLoading: booksIsLoading } = useBooks(page);
-
-  const filteredBooks = books?.data?.filter((book) => {
-    const matchesSearch =
-      book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      categoryFilter === "all" ||
-      book.category.name.toLowerCase().replace(/\s+/g, "-") === categoryFilter;
-    const matchesStatus =
-      statusFilter === "all" ||
-      (statusFilter === "available" && book.is_available === true) ||
-      (statusFilter === "checked-out" && book.is_available === false);
-
-    return matchesSearch && matchesCategory && matchesStatus;
+  const { data: categories, isLoading: catIsLoading } = useCategories();
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const { data: books, isLoading: booksIsLoading } = useBooks({
+    page,
+    title: debouncedSearchTerm,
+    category: categoryFilter,
+    status: statusFilter,
   });
 
   const handleNextPage = () => {
@@ -113,14 +90,20 @@ export default function BooksPage() {
                   placeholder="Search books by title, author, or ISBN..."
                   className="pl-10"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setPage(1);
+                    setSearchTerm(e.target.value);
+                  }}
                 />
               </div>
               <div className="flex space-x-2 items-end">
                 {!catIsLoading ? (
                   <Select
                     value={categoryFilter}
-                    onValueChange={setCategoryFilter}
+                    onValueChange={(value) => {
+                      setPage(1);
+                      setCategoryFilter(value);
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Category" />
@@ -128,7 +111,7 @@ export default function BooksPage() {
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
                       {categories?.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.name}>
+                        <SelectItem key={cat.id} value={String(cat.id)}>
                           {cat.name}
                         </SelectItem>
                       ))}
@@ -137,7 +120,13 @@ export default function BooksPage() {
                 ) : (
                   <div className="bg-neutral-800 w-35 rounded-md h-10"></div>
                 )}
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <Select
+                  value={statusFilter}
+                  onValueChange={(value) => {
+                    setPage(1);
+                    setStatusFilter(value);
+                  }}
+                >
                   <SelectTrigger className="w-full sm:w-32">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
@@ -151,236 +140,99 @@ export default function BooksPage() {
               </div>
             </div>
 
-            {/* Results count */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-600">
-                Showing {filteredBooks?.length} of {books?.data?.length} books
-              </p>
-            </div>
-
-            {/* Table View */}
-            {viewMode === "table" && (
-              <div className="rounded-md border overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Title</TableHead>
-                      <TableHead>Author</TableHead>
-                      <TableHead className="hidden sm:table-cell">
-                        Category
-                      </TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Location
-                      </TableHead>
-                      <TableHead className="hidden lg:table-cell">
-                        Condition
-                      </TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredBooks?.map((book) => (
-                      <TableRow key={book.id}>
-                        <TableCell className="font-medium">
-                          <div>
-                            <div className="font-medium">{book.title}</div>
-                            <div className="text-sm text-gray-500 sm:hidden">
-                              {book.author}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          {book.author}
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          {book.category.name}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              book.is_available ? "default" : "secondary"
-                            }
-                          >
-                            {book.is_available ? "Available" : "CheckedOut"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {book.location}
-                        </TableCell>
-                        <TableCell className="hidden lg:table-cell">
-                          <Badge
-                            variant="outline"
-                            className={
-                              book.condition === "excellent"
-                                ? "text-green-700 border-green-200 dark:text-green-400 dark:border-green-800"
-                                : book.condition === "good"
-                                ? "text-blue-700 border-blue-200 dark:text-blue-400 dark:border-blue-800"
-                                : book.condition === "bad"
-                                ? "text-yellow-700 border-yellow-200 dark:text-yellow-400 dark:border-yellow-800"
-                                : "text-red-700 border-red-200 dark:text-red-400 dark:border-red-800"
-                            }
-                          >
-                            {book.condition}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              title="View details"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" title="Edit book">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              title="Delete book"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
+            {booksIsLoading ? (
+              viewMode === "cards" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {Array.from({ length: 12 }).map((_, index) => (
+                    <BookSkeleton key={index} />
+                  ))}
+                </div>
+              ) : (
+                <div className="w-full">
+                  <div>
+                    <Skeleton className="h-10 rounded mb-4" />
+                    {Array.from({ length: 8 }).map((_, idx) => (
+                      <Skeleton key={idx} className="h-8 rounded mb-2" />
                     ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+                  </div>
+                </div>
+              )
+            ) : (
+              <>
+                {/* Results count */}
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600">
+                    Showing from {books?.from ?? 0} to {books?.to ?? 0} of{" "}
+                    {books?.total} books
+                  </p>
+                </div>
 
-            {/* Card View */}
-            {viewMode === "cards" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredBooks?.map((book) => (
-                  <Card
-                    key={book.id}
-                    className="overflow-hidden hover:shadow-lg transition-shadow"
-                  >
-                    <div className="aspect-[3/4] relative bg-gray-100">
-                      <img
-                        src={book.image || "/placeholder.svg"}
-                        alt={`Cover of ${book.title}`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-2 right-2">
-                        <Badge
-                          variant={book.is_available ? "default" : "secondary"}
-                        >
-                          {book.is_available ? "Available" : "CheckedOut"}
-                        </Badge>
-                      </div>
-                    </div>
-                    <CardContent className="p-4">
-                      <div className="space-y-2">
-                        <h3 className="font-semibold text-lg leading-tight line-clamp-2">
-                          {book.title}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          by {book.author}
-                        </p>
+                {/* Table View */}
+                {viewMode === "table" && (
+                  <DataTable data={books?.data ?? []} columns={columns} />
+                )}
 
-                        <div className="flex items-center justify-between text-xs text-gray-500">
-                          <span>{book.category.name}</span>
-                          <span>{book.pages} pages</span>
-                        </div>
+                {/* Card View */}
+                {viewMode === "cards" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {books?.data?.map((book) => (
+                      <BookCard book={book} key={book.id} />
+                    ))}
+                  </div>
+                )}
 
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-gray-500">
-                            Location: {book.location}
-                          </span>
-                          <Badge
-                            variant="outline"
-                            className={
-                              book.condition === "excellent"
-                                ? "text-green-700 border-green-200 dark:text-green-400 dark:border-green-800"
-                                : book.condition === "good"
-                                ? "text-blue-700 border-blue-200 dark:text-blue-400 dark:border-blue-800"
-                                : book.condition === "bad"
-                                ? "text-yellow-700 border-yellow-200 dark:text-yellow-400 dark:border-yellow-800"
-                                : "text-red-700 border-red-200 dark:text-red-400 dark:border-red-800"
-                            }
-                          >
-                            {book.condition}
-                          </Badge>
-                        </div>
+                {/* Empty state */}
+                {books?.data?.length === 0 && (
+                  <div className="text-center py-12">
+                    <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      No books found
+                    </h3>
+                    <p className="text-gray-500 mb-4">
+                      {searchTerm ||
+                      categoryFilter !== "all" ||
+                      statusFilter !== "all"
+                        ? "Try adjusting your search or filters"
+                        : "Get started by adding your first book to the library"}
+                    </p>
+                    <Button asChild>
+                      <Link to="/books/add">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Book
+                      </Link>
+                    </Button>
+                  </div>
+                )}
 
-                        {book.description && (
-                          <p className="text-xs text-gray-600 line-clamp-2 mt-2">
-                            {book.description}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="flex space-x-2 mt-4">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 bg-transparent"
-                          title="View details"
-                        >
-                          <Eye className="h-3 w-3 mr-1" />
-                          View
-                        </Button>
-                        <Button variant="ghost" size="sm" title="Edit book">
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button variant="ghost" size="sm" title="Delete book">
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-
-            {/* Empty state */}
-            {filteredBooks?.length === 0 && (
-              <div className="text-center py-12">
-                <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No books found
-                </h3>
-                <p className="text-gray-500 mb-4">
-                  {searchTerm ||
-                  categoryFilter !== "all" ||
-                  statusFilter !== "all"
-                    ? "Try adjusting your search or filters"
-                    : "Get started by adding your first book to the library"}
-                </p>
-                <Button asChild>
-                  <Link to="/books/add">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Book
-                  </Link>
-                </Button>
-              </div>
-            )}
-
-            {/* Pagination controls */}
-            {books?.data && books?.data?.length > 0 && (
-              <div className="flex justify-between items-center mt-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePreviousPage}
-                  disabled={page === 1}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleNextPage}
-                  disabled={!books?.next_page_url}
-                >
-                  Next
-                </Button>
-              </div>
+                {/* Pagination controls */}
+                {books?.data && books?.data?.length > 0 && (
+                  <div className="flex justify-between items-center mt-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handlePreviousPage}
+                      disabled={page === 1}
+                    >
+                      Previous
+                    </Button>
+                    <span className="text-sm text-gray-600">
+                      Page {page} of{" "}
+                      {Math.ceil((books?.total ?? 0) / (books?.per_page ?? 1))}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleNextPage}
+                      disabled={
+                        page >=
+                        Math.ceil((books?.total ?? 0) / (books?.per_page ?? 1))
+                      }
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { useAuth } from "./auth-guard";
+import { useAuth } from "../provider/AuthProvider";
 import { Loader2Icon } from "lucide-react";
 
 const FormLayout = () => {

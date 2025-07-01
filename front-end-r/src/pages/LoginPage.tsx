@@ -1,8 +1,12 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { BookOpen, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
-import { Eye, EyeOff, BookOpen, Mail, Lock, AlertCircle } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
+import { Toaster } from "sonner";
+import { z } from "zod";
+import { ThemeToggle } from "../components/theme-toggle";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
 import {
   Card,
   CardContent,
@@ -10,15 +14,9 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Alert, AlertDescription } from "../components/ui/alert";
-import { Checkbox } from "../components/ui/checkbox";
-import { ThemeToggle } from "../components/theme-toggle";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../components/auth-guard";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Toaster } from "sonner";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { useAuth } from "../provider/AuthProvider";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "please enter a valid email" }),
@@ -39,8 +37,6 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
   const [showPassword, setShowPassword] = useState(false);
-
-  const navigate = useNavigate();
 
   const { login, fetchState } = useAuth();
 

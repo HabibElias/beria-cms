@@ -16,7 +16,7 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { PageHeader } from "../components/page-header";
 import { Link } from "react-router-dom";
-import useCategories from "../hooks/useCategories";
+// import useCategories from "../hooks/useCategories";
 
 export default function Dashboard() {
 

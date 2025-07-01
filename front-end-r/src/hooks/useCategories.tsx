@@ -1,10 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "../services/Apiclient";
+import type Category from "../models/Category";
 
-interface Category {
-  id: number;
-  name: string;
-}
 
 interface FetchCategoriesResponse {
   status: boolean;

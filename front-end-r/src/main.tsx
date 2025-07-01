@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import { ThemeProvider } from "next-themes";
 import { RouterProvider } from "react-router-dom";
-import AuthProvider from "./components/auth-guard.tsx";
+import AuthProvider from "./provider/AuthProvider.tsx";
 import routes from "./routes.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 

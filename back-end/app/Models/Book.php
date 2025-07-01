@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Book extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'author', 'book_img'];
+
+    protected $guarded = [];
 
     public function checkout(): BelongsTo
     {

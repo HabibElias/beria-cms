@@ -20,10 +20,12 @@ return new class extends Migration
             $table->string('notes')->nullable();
             $table->integer('pages');
             $table->string('location');
-            $table->foreignIdFor(Category::class)->nullable();
+            $table->string('publisher')->nullable();
+            $table->integer('published_year')->nullable();
+            $table->foreignIdFor(Category::class);
             $table->boolean('is_available')->default(true);
             $table->enum('condition', ['excellent', 'good', 'bad']);
-            $table->string('book_img');
+            $table->string('book_img')->nullable();
             $table->timestamps();
         });
     }
