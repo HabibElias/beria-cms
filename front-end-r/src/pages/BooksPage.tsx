@@ -134,7 +134,6 @@ export default function BooksPage() {
                     <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="available">Available</SelectItem>
                     <SelectItem value="checked-out">Checked Out</SelectItem>
-                    <SelectItem value="overdue">Overdue</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

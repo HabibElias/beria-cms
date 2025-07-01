@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 import { z } from "zod";
 import { PageHeader } from "../components/page-header";
 import { Button } from "../components/ui/button";
@@ -22,55 +21,16 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Textarea } from "../components/ui/textarea";
-import apiClient from "../services/Apiclient";
-
-const BookSchema = z.object({
-  title: z
-    .string({ message: "Title is required" })
-    .min(3, { message: "Title must be between 3 and 100 characters" })
-    .max(100),
-  author: z
-    .string({ message: "Author is required" })
-    .min(3, { message: "Author must be between 3 and 100 characters" })
-    .max(100),
-  category_id: z
-    .number({ message: "Category is required" })
-    .positive({ message: "Category must be a valid ID" }),
-  publisher: z.string().optional(),
-  published_year: z
-    .union([z.string(), z.number()])
-    .refine((val) => Number(val) > 0, {
-      message: "Published Year must be a positive number",
-    })
-    .transform((val) => Number(val)),
-  pages: z
-    .union([z.string(), z.number()])
-    .refine((val) => Number(val) > 0, {
-      message: "Pages must be a positive number",
-    })
-    .transform((val) => Number(val)),
-  location: z
-    .string({ message: "Location is required" })
-    .min(1, { message: "Location must be at least 1 character" })
-    .max(10, { message: "Location must be at most 10 characters" }),
-  condition: z.enum(["excellent", "good", "bad"], {
-    message: "Condition is required",
-  }),
-  description: z
-    .string({ message: "Description is required" })
-    .min(3, { message: "Description must be between 3 and 400 characters" })
-    .max(400),
-  notes: z.string().optional(),
-});
-
-interface CreateBookResponse {
-  status: boolean;
-  message: string;
-}
+import BookSchema from "../models/BookSchema";
+import { toast } from "sonner";
+import useAddBooks from "../hooks/useAddBooks";
+import useCategories from "../hooks/useCategories";
+import { Skeleton } from "../components/ui/skeleton";
 
 type FormData = z.infer<typeof BookSchema>;
 
 export default function AddBookPage() {
+  // form
   const {
     reset,
     register,
@@ -89,27 +49,16 @@ export default function AddBookPage() {
   const condition = watch("condition");
   const category_id = watch("category_id");
 
-  const onSubmit = async (data: FormData) => {
-    console.log(data);
+  const { mutate, isPending } = useAddBooks();
+  const { data: categories, isLoading: catIsLoading } = useCategories();
 
-    try {
-      const response = (
-        await apiClient.post<CreateBookResponse>("/books", data)
-      ).data;
-
-      toast.success(response.message);
-
-      reset();
-    } catch (error: any) {
-      console.error(error);
-      if (error.response.data.errors) {
-        for (const key in error.response.data.errors) {
-          toast.error(
-            error.response.data.errors[key][0] ?? "An unknown error occurred"
-          );
-        }
-      }
-    }
+  const onSubmit = (data: FormData) => {
+    mutate(data, {
+      onSuccess: () => {
+        reset();
+        toast.success("Book added successfully!");
+      },
+    });
   };
 
   return (
@@ -263,28 +212,27 @@ export default function AddBookPage() {
                     <Label htmlFor="category">
                       Category <span className="text-red-400">*</span>
                     </Label>
-                    <Select
-                      value={category_id?.toString()}
-                      onValueChange={(value) =>
-                        setValue("category_id", Number(value))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">Christian Living</SelectItem>
-                        <SelectItem value="2">Devotional</SelectItem>
-                        <SelectItem value="3">Apologetics</SelectItem>
-                        <SelectItem value="4">Theology</SelectItem>
-                        <SelectItem value="5">Biography</SelectItem>
-                        <SelectItem value="6">Youth</SelectItem>
-                        <SelectItem value="7">Children</SelectItem>
-                        <SelectItem value="8">Marriage & Family</SelectItem>
-                        <SelectItem value="9">Leadership</SelectItem>
-                        <SelectItem value="10">Bible Study</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    {!catIsLoading ? (
+                      <Select
+                        value={category_id?.toString()}
+                        onValueChange={(value) =>
+                          setValue("category_id", Number(value))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories?.map((cat) => (
+                            <SelectItem key={cat.id} value={String(cat.id)}>
+                              {cat.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                        <Skeleton className="w-1/2 h-10 rounded-md" />
+                    )}
                     {errors.category_id && (
                       <div className="text-xs mt-2 text-red-400">
                         <p>{errors.category_id.message}</p>
@@ -329,7 +277,9 @@ export default function AddBookPage() {
                   <Button variant="outline" asChild>
                     <Link to="/books">Cancel</Link>
                   </Button>
-                  <Button type="submit">Add Book</Button>
+                  <Button type="submit" disabled={isPending}>
+                    {isPending ? "Adding..." : "Add Book"}
+                  </Button>
                 </div>
               </form>
             </CardContent>
