@@ -34,7 +34,7 @@ class BookPolicy
         return $user->role === 'admin';
     }
 
-    public function update(User $user): bool
+    public function update(User $user, Book $book): bool
     {
         return $user->role === 'admin';
     }

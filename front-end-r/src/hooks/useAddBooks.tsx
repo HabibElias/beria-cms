@@ -1,19 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import apiClient from "../services/Apiclient";
+import type { z } from "zod";
+import type BookSchema from "../models/BookSchema";
 
-type FormData = {
-  title: string;
-  author: string;
-  category_id: number;
-  publisher?: string;
-  published_year?: number;
-  pages: number;
-  location: string;
-  condition: "excellent" | "good" | "bad";
-  description: string;
-  notes?: string;
-};
+type FormData = z.infer<typeof BookSchema>
 
 const useAddBooks = () => {
   return useMutation<unknown, Error, FormData>({

@@ -101,5 +101,14 @@ class BookController extends Controller
     public function destroy(string $id)
     {
         //
+        $book = Book::find($id);
+
+        if (!$book) {
+            return response()->json(['status' => false, 'message' => 'book not found'], 400);
+        }
+
+        Book::destroy($id);
+
+        return response()->json(['status' => true, 'message' => 'book deleted successfully'], 200);
     }
 }

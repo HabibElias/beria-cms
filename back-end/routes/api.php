@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SessionController;
@@ -6,7 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 // Public Auth Routes
-Route::post('login', [SessionController::class, 'store']);
+Route::post('login', [SessionController::class, 'store'])->name('login');
 Route::post('register', [SessionController::class, 'register']);
 Route::post('refresh', [SessionController::class, 'update']);
 
@@ -18,8 +19,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('books', [BookController::class, 'index']);
     Route::post('books', [BookController::class, 'store'])->can('create', User::class);
     Route::get('books/{book}', [BookController::class, 'show']);
-    Route::put('books/{book}', [BookController::class, 'update']);
-    Route::delete('books/{book}', [BookController::class, 'destroy']);
+    Route::put('books/{book}', [BookController::class, 'update'])->can('update', User::class);
+    Route::delete('books/{book}', [BookController::class, 'destroy'])->can('create', User::class);
 
     // Categories
     Route::apiResource('categories', CategoryController::class);
