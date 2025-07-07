@@ -1,8 +1,21 @@
-import { Eye, Edit, Trash2 } from "lucide-react";
-import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
-import { Card, CardContent } from "../ui/card";
+import { Edit, Eye, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import useDeleteBook from "../../hooks/useDeleteBook";
 import type Book from "../../models/Book";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
 import { Skeleton } from "../ui/skeleton";
 
 export const BookSkeleton = () => {
@@ -20,11 +33,15 @@ export const BookSkeleton = () => {
 };
 
 const BookCard = ({ book }: { book: Book }) => {
+  const navigate = useNavigate();
+  const { mutate: deleteBook } = useDeleteBook();
+  const [open, setOpen] = useState<boolean>(false);
+
   return (
     <Card className="overflow-hidden pt-0 hover:shadow-lg transition-shadow">
       <div className="aspect-[3/4] relative bg-gray-100">
         <img
-          src={book.image || "/placeholder.svg"}
+          src={book.book_img || "/placeholder.svg"}
           alt={`Cover of ${book.title}`}
           className="w-full h-full object-cover"
         />
@@ -77,6 +94,7 @@ const BookCard = ({ book }: { book: Book }) => {
             size="sm"
             className="flex-1 bg-transparent"
             title="View details"
+            onClick={() => navigate(`/books/${book.id}`)}
           >
             <Eye className="h-3 w-3 mr-1" />
             View
@@ -84,9 +102,46 @@ const BookCard = ({ book }: { book: Book }) => {
           <Button variant="ghost" size="sm" title="Edit book">
             <Edit className="h-3 w-3" />
           </Button>
-          <Button variant="ghost" size="sm" title="Delete book">
-            <Trash2 className="h-3 w-3" />
-          </Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                onClick={() => setOpen(true)}
+                size="sm"
+                title="Delete book"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="font-[poppins]">
+              <DialogHeader>
+                <DialogTitle>Are you absolutely sure?</DialogTitle>
+                <DialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your book data from our servers.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                  asChild
+                >
+                  <Button variant={"ghost"}>Cancel</Button>
+                </DialogClose>
+                <Button
+                  variant={"destructive"}
+                  onClick={() => {
+                    setOpen(false);
+                    deleteBook({ id: book.id, path: book.book_path });
+                  }}
+                >
+                  Continue
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardContent>
     </Card>

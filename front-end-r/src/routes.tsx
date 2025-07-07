@@ -12,6 +12,7 @@ import Layout from "./components/layout";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import ErrorPage from "./components/error-page";
 import FormLayout from "./components/form-layout";
+import BookPage from "./pages/BookPage";
 
 const routes = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const routes = createBrowserRouter([
           {
             path: "/books/add",
             element: <AddBookPage />,
+          },
+          {
+            path: "/books/:id",
+            element: <BookPage />,
           },
           {
             path: "/members",

@@ -30,7 +30,7 @@ class BookFactory extends Factory
             'location' => strtoupper(fake()->randomLetter()) . "-" . fake()->randomDigit(),
             'pages' => fake()->numberBetween(100, 500),
             'is_available' => fake()->boolean(70),
-            'book_img' => fake()->imageUrl()
+            // 'book_img' => fake()->imageUrl()
         ];
     }
 }

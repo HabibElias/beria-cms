@@ -26,6 +26,8 @@ import { toast } from "sonner";
 import useAddBooks from "../hooks/useAddBooks";
 import useCategories from "../hooks/useCategories";
 import { Skeleton } from "../components/ui/skeleton";
+import { useState } from "react";
+import { supabase } from "../config/supabase";
 
 type FormData = z.infer<typeof BookSchema>;
 
@@ -48,14 +50,65 @@ export default function AddBookPage() {
 
   const condition = watch("condition");
   const category_id = watch("category_id");
-
-  const { mutate, isPending } = useAddBooks();
+  const [bookImg, setBookImg] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState<boolean>(false);
+  const [bookImgFile, setBookImgFile] = useState<File | null>(null);
+  const { mutate, isPending: storeIsPending } = useAddBooks();
   const { data: categories, isLoading: catIsLoading } = useCategories();
 
-  const onSubmit = (data: FormData) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setBookImgFile(file);
+      // Create preview for images
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setBookImg(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setBookImg(null);
+      }
+    } else {
+      setBookImgFile(null);
+      setBookImg(null);
+    }
+  };
+  const onSubmit = async (data: FormData) => {
+    if (bookImgFile) {
+      setIsPending(true);
+      const filePath = `books/${Date.now()}_${bookImgFile.name}`;
+      const { data: supabaseData, error } = await supabase.storage
+        .from(import.meta.env.VITE_SUPABASE_BUCKET)
+        .upload(filePath, bookImgFile);
+
+      if (error) {
+        toast.error("Failed to upload image.");
+        setIsPending(false);
+        return;
+      }
+
+      const { data: imgUrlData } = supabase.storage
+        .from(import.meta.env.VITE_SUPABASE_BUCKET)
+        .getPublicUrl(supabaseData.path);
+
+      if (!imgUrlData) {
+        toast.error("Failed to get image.");
+        setIsPending(false);
+        return;
+      }
+
+      data.book_img = imgUrlData?.publicUrl;
+      data.book_path = supabaseData?.path;
+      setIsPending(false);
+    }
+
     mutate(data, {
       onSuccess: () => {
         reset();
+        setBookImg(null);
+        setBookImgFile(null);
         toast.success("Book added successfully!");
       },
     });
@@ -83,6 +136,26 @@ export default function AddBookPage() {
             </CardHeader>
             <CardContent>
               <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+                <div>
+                  <Label htmlFor="book-img">Book Image</Label>
+                  <Input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    onChange={handleFileChange}
+                    name="book-img"
+                    id="book-img"
+                  />
+                  {bookImg && (
+                    <div className="mt-2">
+                      <span className="text-gray-500">Image Preview:</span>
+                      <img
+                        src={bookImg}
+                        alt="book-img Preview"
+                        className="mt-2 max-h-40 rounded-md border"
+                      />
+                    </div>
+                  )}
+                </div>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="title">
@@ -231,7 +304,7 @@ export default function AddBookPage() {
                         </SelectContent>
                       </Select>
                     ) : (
-                        <Skeleton className="w-1/2 h-10 rounded-md" />
+                      <Skeleton className="w-1/2 h-10 rounded-md" />
                     )}
                     {errors.category_id && (
                       <div className="text-xs mt-2 text-red-400">
@@ -278,7 +351,7 @@ export default function AddBookPage() {
                     <Link to="/books">Cancel</Link>
                   </Button>
                   <Button type="submit" disabled={isPending}>
-                    {isPending ? "Adding..." : "Add Book"}
+                    {isPending || storeIsPending ? "Adding..." : "Add Book"}
                   </Button>
                 </div>
               </form>

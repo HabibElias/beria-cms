@@ -1,6 +1,8 @@
 import z from "zod";
 
 const BookSchema = z.object({
+  book_img: z.string().optional(),
+  book_path: z.string().optional(),
   title: z
     .string({ message: "Title is required" })
     .min(3, { message: "Title must be between 3 and 100 characters" })

@@ -26,6 +26,7 @@ return new class extends Migration
             $table->boolean('is_available')->default(true);
             $table->enum('condition', ['excellent', 'good', 'bad']);
             $table->string('book_img')->nullable();
+            $table->string('book_path')->nullable();
             $table->timestamps();
         });
     }

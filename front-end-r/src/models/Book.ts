@@ -7,10 +7,13 @@ export default interface Book {
   category: Category;
   is_available: boolean;
   location: string;
-  dateAdded: string;
+  created_at: string;
   description: string;
   pages: number;
   publisher: string;
+  published_year: number;
+  notes: string;
   condition: string;
-  image: string;
+  book_img: string;
+  book_path: string;
 }

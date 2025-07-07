@@ -17,7 +17,7 @@ class BookController extends Controller
     {
 
         //
-        $query = Book::with('category');
+        $query = Book::with('category')->latest();
 
         if ($request->has('title')) {
             $query->where('title', 'like', '%' . $request->get('title') . '%');
@@ -58,7 +58,8 @@ class BookController extends Controller
                     'published_year' => 'required|integer:min:0',
                     'category_id' => 'required|integer',
                     'condition' => 'required|in:excellent,good,bad',
-                    'book_img' => 'url:http,https'
+                    'book_img' => 'url:http,https',
+                    'book_path' => 'max:100'
                 ]
             );
 
@@ -84,7 +85,11 @@ class BookController extends Controller
     public function show(string $id)
     {
         //
-        return Book::findOrFail($id);
+        $book = Book::with('category')->find($id);
+
+        if (!$book) return response()->json(["status" => false, "message" => "No book found with that id", "data" => json_encode([])], 400);
+
+        return response()->json(["status" => true, "message" => "Book found", "data" => $book], 200);
     }
 
     /**
@@ -93,6 +98,43 @@ class BookController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        try {
+            $attr = $request->validate(
+                [
+                    'title' => 'sometimes|required|min:3|max:100',
+                    'author' => 'sometimes|required|min:3|max:100',
+                    'description' => 'sometimes|required|min:3|max:400',
+                    'notes' => 'sometimes|max:400',
+                    'pages' => 'sometimes|required|integer',
+                    'location' => 'sometimes|required|min:1|max:10',
+                    'publisher' => 'sometimes|max:100',
+                    'published_year' => 'sometimes|required|integer|min:0',
+                    'category_id' => 'sometimes|required|integer',
+                    'condition' => 'sometimes|required|in:excellent,good,bad',
+                    'book_img' => 'sometimes|url:http,https',
+                    'book_path' => 'sometimes|max:100'
+                ]
+            );
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'errors' => $e->errors(),
+            ], 422);
+        }
+
+        $book = Book::find($id);
+
+        if (!$book) {
+            return response()->json(['status' => false, 'message' => 'book not found'], 400);
+        }
+
+        $book->update($attr);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'book updated successfully',
+            'data' => $book
+        ], 200);
     }
 
     /**

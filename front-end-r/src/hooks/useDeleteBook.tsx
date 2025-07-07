@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryClient } from "../main";
 import apiClient from "../services/Apiclient";
+import { supabase } from "../config/supabase";
 
 interface DeleteResponse {
   status: boolean;
@@ -9,12 +10,20 @@ interface DeleteResponse {
 }
 
 const useDeleteBook = () => {
-  return useMutation<DeleteResponse, Error, number>({
-    mutationFn: async (id: number) => {
+  return useMutation<DeleteResponse, Error, { id: number; path: string }>({
+    mutationFn: async ({ id, path }) => {
+      if (path)
+        await supabase.storage
+          .from(import.meta.env.VITE_SUPABASE_BUCKET)
+          .remove([path])
+          .then((res) => {
+            console.log(res.data);
+          });
+
       const response = await apiClient.delete<DeleteResponse>(`/books/${id}`);
       return response.data;
     },
-    onMutate: async (id: number) => {
+    onMutate: async ({ id }) => {
       await queryClient.cancelQueries({ queryKey: ["books"] });
 
       const previousBooks = queryClient.getQueryData<{ data: any[] }>([

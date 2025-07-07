@@ -11,6 +11,7 @@ import {
 } from "../../components/ui/dropdown-menu";
 import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import useDeleteBook from "../../hooks/useDeleteBook";
+import { useNavigate } from "react-router-dom";
 
 export const columns: ColumnDef<Book>[] = [
   {
@@ -18,6 +19,7 @@ export const columns: ColumnDef<Book>[] = [
     cell: ({ row }) => {
       const book = row.original;
       const { mutate: deleteBook } = useDeleteBook();
+      const navigate = useNavigate();
 
       return (
         <DropdownMenu>
@@ -34,7 +36,10 @@ export const columns: ColumnDef<Book>[] = [
           <DropdownMenuContent className="font-[poppins]" align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem title="View details">
+            <DropdownMenuItem
+              onClick={() => navigate(`/books/${book.id}`)}
+              title="View details"
+            >
               <Eye className="h-4 w-4" /> view
             </DropdownMenuItem>
             <DropdownMenuItem title="Edit book">
@@ -42,7 +47,7 @@ export const columns: ColumnDef<Book>[] = [
             </DropdownMenuItem>
             <DropdownMenuItem
               title="Delete book"
-              onClick={() => deleteBook(book.id)}
+              onClick={() => deleteBook({ id: book.id, path: book.book_path })}
             >
               <Trash2 className="h-4 w-4" /> delete
             </DropdownMenuItem>
