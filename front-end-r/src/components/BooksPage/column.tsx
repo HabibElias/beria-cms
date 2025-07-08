@@ -9,17 +9,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
-import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
-import useDeleteBook from "../../hooks/useDeleteBook";
+import { Edit, Eye, Loader2Icon, MoreHorizontal, Trash2 } from "lucide-react";
+import useDeleteBook from "../../hooks/book/useDeleteBook";
 import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "../../components/ui/dialog";
+import { DialogHeader, DialogFooter } from "../ui/dialog";
+import { useState } from "react";
 
 export const columns: ColumnDef<Book>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
       const book = row.original;
-      const { mutate: deleteBook } = useDeleteBook();
+      const { mutate: deleteBook, isPending } = useDeleteBook();
       const navigate = useNavigate();
+      const [open, setOpen] = useState<boolean>(false);
 
       return (
         <DropdownMenu>
@@ -42,14 +53,63 @@ export const columns: ColumnDef<Book>[] = [
             >
               <Eye className="h-4 w-4" /> view
             </DropdownMenuItem>
-            <DropdownMenuItem title="Edit book">
+            <DropdownMenuItem
+              onClick={() => navigate(`/books/${book.id}/edit`)}
+              title="Edit book"
+            >
               <Edit className="h-4 w-4" /> edit
             </DropdownMenuItem>
             <DropdownMenuItem
               title="Delete book"
-              onClick={() => deleteBook({ id: book.id, path: book.book_path })}
+              onClick={(e) => e.preventDefault()}
             >
-              <Trash2 className="h-4 w-4" /> delete
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setOpen(true)}
+                    size="sm"
+                    title="Delete book"
+                  >
+                    <Trash2 className="h-3 w-3" /> delete
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="font-[poppins]">
+                  <DialogHeader>
+                    <DialogTitle>Are you absolutely sure?</DialogTitle>
+                    <DialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      your book data from our servers.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose
+                      onClick={() => {
+                        setOpen(false);
+                      }}
+                      asChild
+                    >
+                      <Button variant={"ghost"} disabled={isPending}>
+                        Cancel
+                      </Button>
+                    </DialogClose>
+                    <Button
+                      variant={"destructive"}
+                      disabled={isPending}
+                      onClick={() => {
+                        deleteBook({ id: book.id, path: book.book_path });
+                        setOpen(false);
+                      }}
+                    >
+                      {isPending ? (
+                        <Loader2Icon className="animate-spin" />
+                      ) : (
+                        "Continue"
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

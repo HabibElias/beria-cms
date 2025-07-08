@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { queryClient } from "../main";
-import apiClient from "../services/Apiclient";
-import { supabase } from "../config/supabase";
+import { queryClient } from "../../main";
+import apiClient from "../../services/Apiclient";
+import { supabase } from "../../config/supabase";
 
 interface DeleteResponse {
   status: boolean;

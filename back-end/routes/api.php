@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SessionController;
+use App\Models\Book;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -17,10 +18,12 @@ Route::middleware(['auth'])->group(function () {
 
     // Books
     Route::get('books', [BookController::class, 'index']);
-    Route::post('books', [BookController::class, 'store'])->can('create', User::class);
+    Route::post('books', [BookController::class, 'store'])->can('admin', Book::class);
     Route::get('books/{book}', [BookController::class, 'show']);
-    Route::put('books/{book}', [BookController::class, 'update'])->can('update', User::class);
-    Route::delete('books/{book}', [BookController::class, 'destroy'])->can('create', User::class);
+    Route::patch('books/{book}', [BookController::class, 'update'])->can('admin', Book::class);
+    Route::delete('books/{book}', [BookController::class, 'destroy'])->can('admin', Book::class);
+
+    //members
 
     // Categories
     Route::apiResource('categories', CategoryController::class);

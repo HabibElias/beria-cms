@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
-import AddBookPage from "./pages/AddBookPage";
-import BooksPage from "./pages/BooksPage";
+import AddBookPage from "./pages/Book/AddBookPage";
+import BooksPage from "./pages/Book/BooksPage";
 import CheckoutsPage from "./pages/CheckoutsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import LoginPage from "./pages/LoginPage";
@@ -12,7 +12,8 @@ import Layout from "./components/layout";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import ErrorPage from "./components/error-page";
 import FormLayout from "./components/form-layout";
-import BookPage from "./pages/BookPage";
+import BookPage from "./pages/Book/BookPage";
+import UpdateBookPage from "./pages/Book/UpdateBookPage";
 
 const routes = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const routes = createBrowserRouter([
           {
             path: "/books/:id",
             element: <BookPage />,
+          },
+          {
+            path: "/books/:id/edit",
+            element: <UpdateBookPage />,
           },
           {
             path: "/members",

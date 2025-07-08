@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getBook } from "../services/BookServices";
+import { getBook } from "../../services/BookServices";
 
 const useBook = (id: string) => {
   return useQuery({

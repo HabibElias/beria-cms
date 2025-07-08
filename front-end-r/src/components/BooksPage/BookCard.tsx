@@ -1,7 +1,7 @@
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Eye, Loader2Icon, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useDeleteBook from "../../hooks/useDeleteBook";
+import useDeleteBook from "../../hooks/book/useDeleteBook";
 import type Book from "../../models/Book";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -34,7 +34,7 @@ export const BookSkeleton = () => {
 
 const BookCard = ({ book }: { book: Book }) => {
   const navigate = useNavigate();
-  const { mutate: deleteBook } = useDeleteBook();
+  const { mutate: deleteBook, isPending } = useDeleteBook();
   const [open, setOpen] = useState<boolean>(false);
 
   return (
@@ -99,7 +99,12 @@ const BookCard = ({ book }: { book: Book }) => {
             <Eye className="h-3 w-3 mr-1" />
             View
           </Button>
-          <Button variant="ghost" size="sm" title="Edit book">
+          <Button
+            variant="ghost"
+            size="sm"
+            title="Edit book"
+            onClick={() => navigate(`/books/${book.id}/edit`)}
+          >
             <Edit className="h-3 w-3" />
           </Button>
           <Dialog open={open} onOpenChange={setOpen}>
@@ -133,11 +138,15 @@ const BookCard = ({ book }: { book: Book }) => {
                 <Button
                   variant={"destructive"}
                   onClick={() => {
-                    setOpen(false);
                     deleteBook({ id: book.id, path: book.book_path });
+                    setOpen(false);
                   }}
                 >
-                  Continue
+                  {isPending ? (
+                    <Loader2Icon className="animate-spin" />
+                  ) : (
+                    "Continue"
+                  )}
                 </Button>
               </DialogFooter>
             </DialogContent>

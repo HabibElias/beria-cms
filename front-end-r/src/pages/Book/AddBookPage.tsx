@@ -3,31 +3,31 @@ import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { z } from "zod";
-import { PageHeader } from "../components/page-header";
-import { Button } from "../components/ui/button";
+import { PageHeader } from "../../components/page-header";
+import { Button } from "../../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../components/ui/card";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+} from "../../components/ui/card";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../components/ui/select";
-import { Textarea } from "../components/ui/textarea";
-import BookSchema from "../models/BookSchema";
+} from "../../components/ui/select";
+import { Textarea } from "../../components/ui/textarea";
+import BookSchema from "../../models/BookSchema";
 import { toast } from "sonner";
-import useAddBooks from "../hooks/useAddBooks";
-import useCategories from "../hooks/useCategories";
-import { Skeleton } from "../components/ui/skeleton";
+import useAddBooks from "../../hooks/book/useAddBooks";
+import useCategories from "../../hooks/useCategories";
+import { Skeleton } from "../../components/ui/skeleton";
 import { useState } from "react";
-import { supabase } from "../config/supabase";
+import { supabase } from "../../config/supabase";
 
 type FormData = z.infer<typeof BookSchema>;
 

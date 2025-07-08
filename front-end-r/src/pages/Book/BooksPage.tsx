@@ -1,25 +1,25 @@
 import { BookOpen, Grid, List, Plus, Search } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import BookCard, { BookSkeleton } from "../components/BooksPage/BookCard";
-import { columns } from "../components/BooksPage/column";
-import { DataTable } from "../components/BooksPage/data-table";
-import { PageHeader } from "../components/page-header";
-import { Button } from "../components/ui/button";
-import { Card, CardContent } from "../components/ui/card";
-import { Input } from "../components/ui/input";
+import BookCard, { BookSkeleton } from "../../components/BooksPage/BookCard";
+import { columns } from "../../components/BooksPage/column";
+import { DataTable } from "../../components/BooksPage/data-table";
+import { PageHeader } from "../../components/page-header";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+import { Input } from "../../components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../components/ui/select";
-import { Skeleton } from "../components/ui/skeleton";
-import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
-import useBooks from "../hooks/useBooks";
-import useCategories from "../hooks/useCategories";
-import useDebounce from "../hooks/useDebounce";
+} from "../../components/ui/select";
+import { Skeleton } from "../../components/ui/skeleton";
+import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
+import useBooks from "../../hooks/book/useBooks";
+import useCategories from "../../hooks/useCategories";
+import useDebounce from "../../hooks/useDebounce";
 type ViewMode = "table" | "cards";
 
 export default function BooksPage() {

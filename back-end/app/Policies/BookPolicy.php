@@ -13,28 +13,7 @@ class BookPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return $user->role === 'admin';
-    }
-
-    public function update(User $user, Book $book): bool
+    public function admin(User $user)
     {
         return $user->role === 'admin';
     }
