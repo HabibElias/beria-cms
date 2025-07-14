@@ -32,5 +32,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     //members
     Route::get('members', [UserController::class, 'index']);
-    Route::post('members', [UserController::class, 'store'])->name('members');
+    Route::get('members/{id}', [UserController::class, 'show']);
+    Route::post('members', [UserController::class, 'store']);
+    Route::delete('members/{id}', [UserController::class, 'destroy']);
 });

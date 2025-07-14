@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\MemberCreateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -69,6 +68,11 @@ class UserController extends Controller
     public function show(string $id)
     {
         //
+        $user = User::find($id);
+        if ($user) {
+            return response()->json(['status' => true, 'data' => $user]);
+        } else
+            return response()->json(['status' => false, 'message' => 'no user with this id'], 400);
     }
 
     /**
@@ -84,6 +88,16 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        if (!$id) {
+            return response()->json(['status' => false, 'message' => 'no id provided'], 422);
+        }
+
+        $user = User::find($id);
+
+        if ($user) {
+            $user->delete();
+            return response()->json(['status' => true, 'message' => 'user deleted'], 200);
+        } else
+            return response()->json(['status' => false, 'message' => 'no user with this id'], 400);
     }
 }

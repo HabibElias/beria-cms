@@ -1,4 +1,12 @@
-import { Edit, Mail, Phone, Plus, Search, Trash2 } from "lucide-react";
+import {
+  Edit,
+  Loader2Icon,
+  Mail,
+  Phone,
+  Plus,
+  Search,
+  Trash2,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { PageHeader } from "../../components/page-header";
 import { Badge } from "../../components/ui/badge";
@@ -16,10 +24,23 @@ import {
 import useMembers from "../../hooks/members/useMembers";
 import { useAuth } from "../../provider/AuthProvider";
 import { Skeleton } from "../../components/ui/skeleton";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "../../components/ui/dialog";
+import { DialogHeader, DialogFooter } from "../../components/ui/dialog";
+import useDeleteMember from "../../hooks/members/useDeleteMembers";
 
 export default function MembersPage() {
   const { data: members, isLoading } = useMembers();
   const { user } = useAuth();
+  const [open, setOpen] = useState<boolean>(false);
+  const { mutate, isPending } = useDeleteMember();
 
   return (
     <div className="space-y-6">
@@ -59,7 +80,7 @@ export default function MembersPage() {
                   </div>
                 </div>
               ) : (
-                <Table>
+                <Table className="overflow-hidden">
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
@@ -110,13 +131,63 @@ export default function MembersPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex space-x-2">
-                              <Button variant="ghost" size="sm">
-                                <Edit className="h-4 w-4" />
+                              <Button variant="ghost" size="icon">
+                                <Edit className="" />
                               </Button>
                               {user?.id !== member.id && (
-                                <Button variant="ghost" size="sm">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <Dialog open={open} onOpenChange={setOpen}>
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      className="w-full justify-start"
+                                      variant="ghost"
+                                      onClick={() => setOpen(true)}
+                                      title="Delete book"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="font-[poppins]">
+                                    <DialogHeader>
+                                      <DialogTitle>
+                                        Are you absolutely sure?
+                                      </DialogTitle>
+                                      <DialogDescription>
+                                        This action cannot be undone. This will
+                                        permanently delete member data from
+                                        our servers.
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter>
+                                      <DialogClose
+                                        onClick={() => {
+                                          setOpen(false);
+                                        }}
+                                        asChild
+                                      >
+                                        <Button
+                                          variant={"ghost"}
+                                          disabled={isPending}
+                                        >
+                                          Cancel
+                                        </Button>
+                                      </DialogClose>
+                                      <Button
+                                        variant={"destructive"}
+                                        disabled={isPending}
+                                        onClick={() => {
+                                          mutate({ id: member.id });
+                                          setOpen(false);
+                                        }}
+                                      >
+                                        {isPending ? (
+                                          <Loader2Icon className="animate-spin" />
+                                        ) : (
+                                          "Continue"
+                                        )}
+                                      </Button>
+                                    </DialogFooter>
+                                  </DialogContent>
+                                </Dialog>
                               )}
                             </div>
                           </TableCell>
