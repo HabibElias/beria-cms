@@ -31,6 +31,7 @@ class BookFactory extends Factory
             'pages' => fake()->numberBetween(100, 500),
             'is_available' => fake()->boolean(70),
             // 'book_img' => fake()->imageUrl()
+            'published_year' => fake()->year('now')
         ];
     }
 }

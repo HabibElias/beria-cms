@@ -38,9 +38,7 @@ const useBooks = ({
         &
         ${status !== "all" && `status=${status ?? ""}`}`
       )
-      .then((res) => {
-        console.log(res.data);
-
+      .then((res) => {  
         return res.data;
       });
 

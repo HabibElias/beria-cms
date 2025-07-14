@@ -53,22 +53,27 @@ export const columns: ColumnDef<Book>[] = [
             >
               <Eye className="h-4 w-4" /> view
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => navigate(`/books/${book.id}/edit`)}
-              title="Edit book"
-            >
-              <Edit className="h-4 w-4" /> edit
+            <DropdownMenuItem onClick={(e) => e.preventDefault()} asChild>
+              <Button
+                className="w-full justify-start"
+                variant="ghost"
+                onClick={() => navigate(`/books/${book.id}/edit`)}
+                title="Delete book"
+              >
+                <Edit className="h-4 w-4" /> edit
+              </Button>
             </DropdownMenuItem>
             <DropdownMenuItem
               title="Delete book"
               onClick={(e) => e.preventDefault()}
+              asChild
             >
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                   <Button
+                    className="w-full justify-start"
                     variant="ghost"
                     onClick={() => setOpen(true)}
-                    size="sm"
                     title="Delete book"
                   >
                     <Trash2 className="h-3 w-3" /> delete

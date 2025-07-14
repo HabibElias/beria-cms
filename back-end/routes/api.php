@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\MemberController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\UserController;
 use App\Models\Book;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -22,9 +24,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('books/{book}', [BookController::class, 'show']);
     Route::patch('books/{book}', [BookController::class, 'update'])->can('admin', Book::class);
     Route::delete('books/{book}', [BookController::class, 'destroy'])->can('admin', Book::class);
-
-    //members
-
     // Categories
     Route::apiResource('categories', CategoryController::class);
+});
+
+
+Route::middleware(['auth'])->group(function () {
+    //members
+    Route::get('members', [UserController::class, 'index']);
+    Route::post('members', [UserController::class, 'store'])->name('members');
 });

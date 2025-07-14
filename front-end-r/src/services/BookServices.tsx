@@ -18,5 +18,8 @@ export const deleteBook = async (id: number) =>
 export const getBook = async (id: string) =>
   (await apiClient.get<GetBookResponse>(`/books/${id}`)).data;
 
+export const getBooks = async () =>
+  (await apiClient.get<GetBookResponse>(`/books`)).data;
+
 export const updateBook = async (id: number, data: Book) =>
   await apiClient.patch(`/books/${id}`, data);

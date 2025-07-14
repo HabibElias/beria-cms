@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { z } from "zod";
@@ -351,7 +351,11 @@ export default function AddBookPage() {
                     <Link to="/books">Cancel</Link>
                   </Button>
                   <Button type="submit" disabled={isPending}>
-                    {isPending || storeIsPending ? "Adding..." : "Add Book"}
+                    {isPending || storeIsPending ? (
+                      <Loader2Icon className="animate-spin" />
+                    ) : (
+                      "Add Book"
+                    )}
                   </Button>
                 </div>
               </form>

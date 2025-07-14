@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Habib Elias',
             'email' => 'habibelias234@gmail.com',
             'password' => 'Ha@12312',
+            'phone' => '+(251) 9 40 82 71 41',
             'role' => 'admin'
         ]);
 

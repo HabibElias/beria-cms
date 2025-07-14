@@ -15,10 +15,7 @@ const useDeleteBook = () => {
       if (path)
         await supabase.storage
           .from(import.meta.env.VITE_SUPABASE_BUCKET)
-          .remove([path])
-          .then((res) => {
-            console.log(res.data);
-          });
+          .remove([path]);
 
       const response = await apiClient.delete<DeleteResponse>(`/books/${id}`);
       return response.data;
