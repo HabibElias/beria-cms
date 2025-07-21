@@ -91,6 +91,7 @@ export default function MembersPage() {
                         Member Since
                       </TableHead>
                       <TableHead>Books Out</TableHead>
+                      <TableHead>Role</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -126,9 +127,10 @@ export default function MembersPage() {
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline">
-                              {member.books_checked_out}
+                              {member.checkouts.length}
                             </Badge>
                           </TableCell>
+                        <TableCell>{member.role[0].toUpperCase()+member.role.slice(1)}</TableCell>
                           <TableCell>
                             <div className="flex space-x-2">
                               <Button variant="ghost" size="icon">
@@ -138,7 +140,7 @@ export default function MembersPage() {
                                 <Dialog open={open} onOpenChange={setOpen}>
                                   <DialogTrigger asChild>
                                     <Button
-                                      className="w-full justify-start"
+                                      className="w-fit justify-start"
                                       variant="ghost"
                                       onClick={() => setOpen(true)}
                                       title="Delete book"
@@ -146,15 +148,15 @@ export default function MembersPage() {
                                       <Trash2 className="h-3 w-3" />
                                     </Button>
                                   </DialogTrigger>
-                                  <DialogContent className="font-[poppins]">
+                                  <DialogContent className="font-[poppins] w-fit">
                                     <DialogHeader>
                                       <DialogTitle>
                                         Are you absolutely sure?
                                       </DialogTitle>
                                       <DialogDescription>
                                         This action cannot be undone. This will
-                                        permanently delete member data from
-                                        our servers.
+                                        permanently delete member data from our
+                                        servers.
                                       </DialogDescription>
                                     </DialogHeader>
                                     <DialogFooter>

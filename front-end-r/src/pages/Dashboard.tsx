@@ -16,10 +16,10 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { PageHeader } from "../components/page-header";
 import { Link } from "react-router-dom";
+import { CheckoutBookDialog } from "../components/sidebar";
 // import useCategories from "../hooks/useCategories";
 
 export default function Dashboard() {
-
   return (
     <div className="space-y-6">
       <PageHeader
@@ -272,16 +272,17 @@ export default function Dashboard() {
                     Add Book
                   </Link>
                 </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="h-20 flex-col bg-transparent"
-                >
-                  <Link to="/checkouts/new">
-                    <Calendar className="h-6 w-6 mb-2" />
-                    Check Out
-                  </Link>
-                </Button>
+                <CheckoutBookDialog
+                  childButton={
+                    <Button
+                      variant="outline"
+                      className="h-20 flex-col bg-transparent"
+                    >
+                      <Calendar className="h-6 w-6 mb-2" />
+                      Check Out
+                    </Button>
+                  }
+                />
                 <Button
                   asChild
                   variant="outline"

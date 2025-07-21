@@ -9,8 +9,6 @@ type FormData = z.infer<typeof BookSchema>;
 const useUpdateBook = () => {
   return useMutation<unknown, Error, { id: string; data: FormData }>({
     mutationFn: async ({ id, data }) => {
-      console.log(data);
-
       const response = await apiClient.patch(`/books/${id}`, data);
       return response.data;
     },

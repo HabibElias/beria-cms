@@ -1,22 +1,24 @@
-import { Edit, Eye, Loader2Icon, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Edit, Eye, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import useDeleteBook from "../../hooks/book/useDeleteBook";
 import type Book from "../../models/Book";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
+
+import { useState } from "react";
+import { Skeleton } from "../ui/skeleton";
+import DeleteBook from "./DeleteBook";
+
+import { useAuth } from "../../provider/AuthProvider";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Skeleton } from "../ui/skeleton";
+import { CheckoutForm } from "./CheckoutForm";
 
 export const BookSkeleton = () => {
   return (
@@ -34,8 +36,6 @@ export const BookSkeleton = () => {
 
 const BookCard = ({ book }: { book: Book }) => {
   const navigate = useNavigate();
-  const { mutate: deleteBook, isPending } = useDeleteBook();
-  const [open, setOpen] = useState<boolean>(false);
 
   return (
     <Card className="overflow-hidden pt-0 hover:shadow-lg transition-shadow">
@@ -107,50 +107,9 @@ const BookCard = ({ book }: { book: Book }) => {
           >
             <Edit className="h-3 w-3" />
           </Button>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                onClick={() => setOpen(true)}
-                size="sm"
-                title="Delete book"
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="font-[poppins]">
-              <DialogHeader>
-                <DialogTitle>Are you absolutely sure?</DialogTitle>
-                <DialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your book data from our servers.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose
-                  onClick={() => {
-                    setOpen(false);
-                  }}
-                  asChild
-                >
-                  <Button variant={"ghost"}>Cancel</Button>
-                </DialogClose>
-                <Button
-                  variant={"destructive"}
-                  onClick={() => {
-                    deleteBook({ id: book.id, path: book.book_path });
-                    setOpen(false);
-                  }}
-                >
-                  {isPending ? (
-                    <Loader2Icon className="animate-spin" />
-                  ) : (
-                    "Continue"
-                  )}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <DeleteBook book={book} />
+          {/* Inline CheckoutBookDialog component */}
+          <CheckoutBookDialog book={book} />
         </div>
       </CardContent>
     </Card>
@@ -158,3 +117,49 @@ const BookCard = ({ book }: { book: Book }) => {
 };
 
 export default BookCard;
+
+export function CheckoutBookDialog({
+  book,
+  isOnMenu,
+}: {
+  isOnMenu?: boolean;
+  book?: Book;
+}) {
+  const [open, setOpen] = useState<boolean>(false);
+  const { user } = useAuth();
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          onClick={() => setOpen(true)}
+          size="sm"
+          title="Checkout book"
+          disabled={!book?.is_available}
+          className={`${
+            isOnMenu ? "w-full flex items-center justify-start" : ""
+          }`}
+        >
+          <ShoppingCart
+            className={`${isOnMenu ? "h-4 w-4 text-white/70" : "h-4 w-4"}`}
+          />
+          {isOnMenu && "checkout"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="font-[poppins]">
+        <DialogHeader>
+          <DialogTitle>Checkout Book</DialogTitle>
+          <DialogDescription>
+            Enter the inputs needed for a checkout
+          </DialogDescription>
+        </DialogHeader>
+        <CheckoutForm
+          bookId={book?.id}
+          bookTittle={book?.title}
+          userId={user?.id}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}

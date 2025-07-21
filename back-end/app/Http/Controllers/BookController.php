@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Checkout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -17,10 +18,10 @@ class BookController extends Controller
     {
 
         //
-        $query = Book::with('category')->latest();
+        $query = Book::with(['category'])->latest();
 
         if ($request->has('title')) {
-            $query->where('title', 'like', '%' . $request->get('title') . '%');
+            $query->whereRaw('LOWER(title) LIKE ?', ['%' . strtolower($request->get('title')) . '%']);
         }
 
         if ($request->has('category')) {
@@ -150,6 +151,8 @@ class BookController extends Controller
         }
 
         Book::destroy($id);
+        $checkouts = Checkout::where('book_id', '=', $id);
+        $checkouts?->delete();
 
         return response()->json(['status' => true, 'message' => 'book deleted successfully'], 200);
     }

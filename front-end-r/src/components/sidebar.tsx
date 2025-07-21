@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   BookOpen,
   LayoutDashboard,
@@ -10,12 +10,24 @@ import {
   X,
   Plus,
   Search,
+  CalendarPlusIcon,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { ThemeToggle } from "../components/theme-toggle";
 import { cn } from "../lib/utils";
 import { UserMenu } from "../components/user-menu";
 import { Link, useLocation } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import { useAuth } from "../provider/AuthProvider";
+import type Book from "../models/Book";
+import { CheckoutForm } from "./BooksPage/CheckoutForm";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -28,7 +40,6 @@ const navigation = [
 
 const quickActions = [
   { name: "Add Book", href: "/books/add", icon: Plus },
-  { name: "New Checkout", href: "/checkouts/new", icon: Calendar },
   { name: "Find Member", href: "/members", icon: Search },
 ];
 
@@ -152,6 +163,7 @@ function SidebarContent({ pathname }: { pathname: string }) {
               {action.name}
             </Link>
           ))}
+          <CheckoutBookDialog />
         </div>
       </div>
 
@@ -165,5 +177,41 @@ function SidebarContent({ pathname }: { pathname: string }) {
         </div>
       </div>
     </div>
+  );
+}
+
+export function CheckoutBookDialog({
+  book,
+  childButton,
+}: {
+  childButton?: ReactNode;
+  book?: Book;
+}) {
+  const [open, setOpen] = useState<boolean>(false);
+  const { user } = useAuth();
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {childButton ?? (
+          <Button
+            variant={"ghost"}
+            className="group flex items-center justify-start w-full px-2 py-2 text-sm font-medium text-muted-foreground rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            <CalendarPlusIcon className="mr-3 h-4 w-4 flex-shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
+            New checkout
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="font-[poppins]">
+        <DialogHeader>
+          <DialogTitle>Checkout Book</DialogTitle>
+          <DialogDescription>
+            Enter the inputs needed for a checkout
+          </DialogDescription>
+        </DialogHeader>
+        <CheckoutForm bookId={book?.id} userId={user?.id} />
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -18,9 +18,12 @@ class Checkout extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
-    public function book(): HasOne
+
+    // Eager load book by default
+    protected $with = ['book'];
+
+    public function book(): BelongsTo
     {
-        return $this->hasOne(Book::class);
+        return $this->belongsTo(Book::class);
     }
 }

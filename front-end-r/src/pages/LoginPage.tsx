@@ -1,5 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BookOpen, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import {
+  BookOpen,
+  Eye,
+  EyeOff,
+  Loader2Icon,
+  Lock,
+  Mail
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
@@ -75,13 +82,6 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert> */}
-              {/* )} */}
-
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="email">Email Address</Label>
@@ -154,7 +154,11 @@ export default function LoginPage() {
                 className="w-full"
                 disabled={fetchState === "logging"}
               >
-                {fetchState === "logging" ? "Signing in..." : "Sign In"}
+                {fetchState === "logging" ? (
+                  <Loader2Icon className="animate-spin" />
+                ) : (
+                  "Sign In"
+                )}
               </Button>
             </form>
 
@@ -186,7 +190,7 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="text-center">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            © 2024  Berea Church. All rights reserved.
+            © 2024 Berea Church. All rights reserved.
           </p>
         </div>
       </div>

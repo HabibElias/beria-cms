@@ -13,5 +13,6 @@ class CheckoutSeeder extends Seeder
     public function run(): void
     {
         //
+        
     }
 }

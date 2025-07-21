@@ -15,11 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('phone');
-            $table->integer('books_checked_out')->default(0);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['admin', 'librarian', 'user'])->default('user');
+            $table->enum('role', ['admin', 'librarian', 'user']);
             $table->rememberToken();
             $table->timestamps();
         });

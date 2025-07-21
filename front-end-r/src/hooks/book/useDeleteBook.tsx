@@ -41,10 +41,15 @@ const useDeleteBook = () => {
 
       return { previousBooks };
     },
-    onError: (_error, _variables, context) => {
-      console.error(_error);
+    onError: (error: any, _variables, context) => {
+      console.error(error);
 
-      toast.error("Failed to delete the book. Please try again." + _error.name);
+      if (error.response.data.message) toast.error(error.response.data.message);
+      else if (error.response.data.errors) {
+        for (const key in error.response.data.errors) {
+          toast.error(error.response.data.errors[key][0]);
+        }
+      } else toast.error("Error Occurred Try again");
       if (
         context &&
         (context as { previousBooks: { data: any[] } }).previousBooks

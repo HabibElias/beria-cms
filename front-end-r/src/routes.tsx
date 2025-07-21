@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import AddBookPage from "./pages/Book/AddBookPage";
 import BooksPage from "./pages/Book/BooksPage";
-import CheckoutsPage from "./pages/CheckoutsPage";
+import CheckoutsPage from "./pages/checkouts/CheckoutsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import LoginPage from "./pages/LoginPage";
 import LogoutPage from "./pages/LogoutPage";

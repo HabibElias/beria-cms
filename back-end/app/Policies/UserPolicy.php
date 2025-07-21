@@ -31,6 +31,10 @@ class UserPolicy
         return $user->role === 'admin';
     }
 
+    public function admin(User $user)
+    {
+        return $user->role === 'admin';
+    }
     /**
      * Determine whether the user can update the model.
      */

@@ -61,6 +61,10 @@ class SessionController extends Controller
             return response()->json(['status' => false, 'message' => 'Invalid Credentials']);
         }
 
+        if ((Auth::user()->role === 'user')) {
+            return response()->json(['status' => false, 'message' => 'User not Authorized']);
+        }
+
         return response()->json(['status' => true, 'user' => Auth::user(), 'token' => $token]);
     }
 

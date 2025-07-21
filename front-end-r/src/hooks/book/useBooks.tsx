@@ -32,11 +32,20 @@ const useBooks = ({
   const fetchBooks = () =>
     apiClient
       .get<FetchBooksResponse>(
-        `/books?per_page=12&page=${page}&title=${title ?? ""}
-        &
-        ${category !== "all" && `category=${category ?? ""}`}
-        &
-        ${status !== "all" && `status=${status ?? ""}`}`
+        (() => {
+          const params = [
+            `per_page=12`,
+            `page=${page}`,
+            `title=${title ?? ""}`,
+          ];
+          if (category && category !== "all") {
+            params.push(`category=${category}`);
+          }
+          if (status && status !== "all") {
+            params.push(`status=${status}`);
+          }
+          return `/books?${params.join("&")}`;
+        })()
       )
       .then((res) => {  
         return res.data;
