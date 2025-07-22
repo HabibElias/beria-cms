@@ -8,5 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class BookReturn extends Model
 {
     /** @use HasFactory<\Database\Factories\BookReturnFactory> */
+    protected $guarded = [];
     use HasFactory;
 }

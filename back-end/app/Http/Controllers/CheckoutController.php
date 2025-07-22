@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\BookReturn;
 use App\Models\Checkout;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -84,7 +85,7 @@ class CheckoutController extends Controller
             );
         } catch (ValidationException $err) {
             return response()->json(
-                ['status' => false, 'errors' => $err->errors()],
+                ['status' => false, 'message' => 'validation errors', 'errors' => $err->errors()],
                 422
             );
         }
@@ -118,6 +119,11 @@ class CheckoutController extends Controller
         //
         if (!$checkout)
             return response()->json(['status' => false, 'message' => 'checkout not found']);
+
+        // first store it in return
+        $attr = $checkout->attributesToArray();
+        BookReturn::create(array_slice($attr, 1));
+
 
         $checkout->delete();
         return response()->json(['status' => true, 'message' => 'checkout deleted']);

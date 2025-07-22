@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronsUpDown, Loader2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 import useBooks from "../../hooks/book/useBooks";
 import useMembers from "../../hooks/members/useMembers";
@@ -28,7 +27,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import apiClient from "../../services/Apiclient";
+import useAddCheckout from "../../hooks/checkout/useAddCheckout";
 
 export function CheckoutForm({
   bookId,
@@ -56,6 +55,8 @@ export function CheckoutForm({
   const [bookSearch, setBookSearch] = useState(bookTittle ?? "");
   const [debouncedBookSearch, setDebouncedBookSearch] = useState("");
   const [filteredUsers, setFilteredUsers] = useState<Member[]>([]);
+
+  const { mutate, isPending } = useAddCheckout();
 
   // Debounce book search input
   useEffect(() => {
@@ -91,39 +92,7 @@ export function CheckoutForm({
   };
 
   async function onSubmit(data: z.infer<typeof CheckoutSchema>) {
-    toast("Checkout request submitted", {
-      description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
-
-    apiClient
-      .post("/checkouts", data)
-      .then((res) => {
-        if (res.status) {
-          toast("Checkout Created", {
-            description: (
-              <pre className="mt-2 w-fit rounded-md bg-neutral-950 p-2">
-                <code className="text-white">
-                  {JSON.stringify(res.data, null, 2)}
-                </code>
-              </pre>
-            ),
-          });
-        }
-      })
-      .catch((err) => {
-        if (err.response.data.errors) {
-          for (const key in err.response.data.errors) {
-            toast.error(err.response.data.errors[key][0]);
-          }
-        }
-        if (err.response.data.message) {
-          toast.error(err.response.data.message);
-        }
-      });
+    mutate({ data });
   }
 
   if (booksLoading && usersLoading) {
@@ -312,8 +281,12 @@ export function CheckoutForm({
             </FormItem>
           )}
         />
-        <Button className="w-full justify-self-end" type="submit">
-          Checkout
+        <Button
+          disabled={isPending}
+          className="w-full justify-self-end"
+          type="submit"
+        >
+          {!isPending ? "Checkout" : <Loader2Icon className="animate-spin" />}
         </Button>
       </form>
     </Form>

@@ -36,6 +36,9 @@ import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import useCheckouts from "../../hooks/checkout/useCheckouts";
 import type Checkout from "../../models/Checkout";
 import { CheckoutBookDialog } from "../../components/sidebar";
+import useDeleteCheckout from "../../hooks/checkout/useDeleteCheckout";
+import DeleteCheckout from "../../components/BooksPage/DeleteCheckout";
+import CheckoutCard from "../../components/BooksPage/CheckoutCard";
 
 type ViewMode = "table" | "cards";
 
@@ -44,6 +47,8 @@ export default function CheckoutsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  const { mutate, isPending } = useDeleteCheckout();
 
   const getDaysRemainingColor = (daysRemaining: number) => {
     if (daysRemaining <= 0) return "text-red-600 dark:text-red-400";
@@ -260,8 +265,19 @@ export default function CheckoutsPage() {
                             <div className="flex space-x-2">
                               {
                                 <>
-                                  <Button variant="outline" size="sm">
-                                    Return
+                                  <Button
+                                    onClick={() => {
+                                      mutate({ id: checkout.id });
+                                    }}
+                                    variant="outline"
+                                    disabled={isPending}
+                                    size="sm"
+                                    asChild
+                                  >
+                                    <DeleteCheckout
+                                      isOnMenu
+                                      checkout={checkout}
+                                    />
                                   </Button>
                                   {checkout.renewal_number < 3 ? (
                                     <Button variant="ghost" size="sm">
@@ -288,137 +304,7 @@ export default function CheckoutsPage() {
             {viewMode === "cards" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredCheckouts?.map((checkout) => (
-                  <Card
-                    key={checkout.id}
-                    className="overflow-hidden hover:shadow-lg transition-shadow"
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex space-x-4">
-                        {/* Book Image */}
-                        <div className="flex-shrink-0">
-                          <img
-                            src={checkout.book.book_img || "/placeholder.svg"}
-                            alt={`Cover of ${checkout.book.title}`}
-                            className="w-16 h-20 object-cover rounded"
-                          />
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 min-w-0 space-y-2">
-                          <div className="flex items-start justify-between">
-                            <div className="min-w-0 flex-1">
-                              <h3 className="font-semibold text-sm leading-tight line-clamp-2">
-                                {checkout.book.title}
-                              </h3>
-                              <p className="text-xs text-gray-600">
-                                by {checkout.book.author}
-                              </p>
-                            </div>
-                            {/* <Badge
-                              variant={
-                                checkout.status === "Active"
-                                  ? "default"
-                                  : checkout.status === "Overdue"
-                                  ? "destructive"
-                                  : "secondary"
-                              }
-                              className="ml-2 flex-shrink-0"
-                            >
-                              {checkout.status}
-                            </Badge> */}
-                          </div>
-
-                          <div className="space-y-1">
-                            <div className="flex items-center text-xs text-gray-600">
-                              <User className="h-3 w-3 mr-1 flex-shrink-0" />
-                              <span className="truncate">
-                                {checkout.user.name}
-                              </span>
-                            </div>
-                            <div className="flex items-center text-xs text-gray-500">
-                              <span className="truncate">
-                                {checkout.user.email}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Dates and Status */}
-                      <div className="mt-4 space-y-2">
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-500">Checked out:</span>
-                          <span>
-                            {new Date(
-                              checkout.return_date
-                            ).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-500">Due date:</span>
-                          <span>
-                            {/* {checkout.status === "Returned"
-                              ? `Returned ${new Date(
-                                  checkout.returnDate!
-                                ).toLocaleDateString()}`
-                              : new Date(checkout.dueDate).toLocaleDateString()} */}
-                          </span>
-                        </div>
-                        {/* {checkout.status !== "Returned" && (
-                          <div className="flex justify-between text-xs">
-                            <span className="text-gray-500">
-                              Time remaining:
-                            </span>
-                            <span
-                              className={getDaysRemainingColor(
-                                checkout.daysRemaining ?? 0,
-                                checkout.status
-                              )}
-                            >
-                              {checkout.status === "Overdue"
-                                ? `${Math.abs(
-                                    checkout.daysRemaining ?? 0
-                                  )} days overdue`
-                                : `${checkout.daysRemaining} days left`}
-                            </span>
-                          </div>
-                        )} */}
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-500">Renewals:</span>
-                          <span>
-                            {0}/{3}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="mt-4 flex space-x-2">
-                        {/* {checkout.status === "Active" ||
-                        checkout.status === "Overdue" ? (
-                          <>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex-1"
-                            >
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                              Return
-                            </Button>
-                            {checkout.renewalCount < checkout.maxRenewals && (
-                              <Button variant="ghost" size="sm">
-                                Renew
-                              </Button>
-                            )}
-                          </>
-                        ) : (
-                          <div className="flex items-center justify-center w-full py-2 text-sm text-gray-500">
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            Completed
-                          </div>
-                        )} */}
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <CheckoutCard key={checkout.id} checkout={checkout} />
                 ))}
               </div>
             )}

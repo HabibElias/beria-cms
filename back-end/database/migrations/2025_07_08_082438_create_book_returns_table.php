@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Book::class);
             $table->foreignIdFor(User::class);
+            $table->timestamp('return_date');
+            $table->integer('renewal_number')->default(0);
             $table->timestamps();
         });
     }

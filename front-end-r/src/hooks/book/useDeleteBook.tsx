@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { queryClient } from "../../main";
 import apiClient from "../../services/Apiclient";
 import { supabase } from "../../config/supabase";
+import type Book from "../../models/Book";
 
 interface DeleteResponse {
   status: boolean;
@@ -23,17 +24,17 @@ const useDeleteBook = () => {
     onMutate: async ({ id }) => {
       await queryClient.cancelQueries({ queryKey: ["books"] });
 
-      const previousBooks = queryClient.getQueryData<{ data: any[] }>([
+      const previousBooks = queryClient.getQueryData<{ data: Book[] }>([
         "books",
       ]);
 
       if (previousBooks && previousBooks.data) {
         queryClient.setQueryData(
           ["books"],
-          (old: { data: any[] } | undefined) => {
+          (old: { data: Book[] } | undefined) => {
             return {
               ...old,
-              data: old?.data.filter((book: any) => book.id !== id),
+              data: old?.data.filter((book: Book) => book.id !== id),
             };
           }
         );
