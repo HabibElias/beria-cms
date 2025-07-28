@@ -28,12 +28,13 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('books/{book}', [BookController::class, 'destroy'])->can('admin', Book::class);
 
     // Categories
-    Route::apiResource('categories', CategoryController::class)->only(['index','update','store', 'destroy']);
+    Route::apiResource('categories', CategoryController::class);
 
     // Members  
     Route::get('members', [MemberController::class, 'index']);
     Route::get('members/{member}', [MemberController::class, 'show']);
     Route::post('members', [MemberController::class, 'store']);
+    Route::patch('members/{member}', [MemberController::class, 'update']);
     Route::delete('members/{member}', [MemberController::class, 'destroy'])->can('admin', 'user');
 
     // Checkouts
@@ -45,4 +46,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Dashboard Analytics
     Route::get('analytics', [ReportController::class, 'index']);
+
+    // User profile and password
+    Route::post('user/profile', [App\Http\Controllers\UserController::class, 'updateProfile']);
+    Route::post('user/password', [App\Http\Controllers\UserController::class, 'updatePassword']);
 });

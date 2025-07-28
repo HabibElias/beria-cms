@@ -6,6 +6,7 @@ use App\Http\Requests\MemberCreateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 
 class MemberController extends Controller
 {
@@ -83,9 +84,36 @@ class MemberController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $member)
     {
-        //
+        // Prevent logged-in user from editing their own info here
+        if ($request->user()->id === $member->id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'You cannot edit your own information here.'
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($member->id),
+            ],
+            'phone' => 'required|string|min:10',
+            'role' => 'required|in:admin,librarian,user',
+        ], [
+            'email.unique' => 'This email address is already in use by another member.',
+        ]);
+
+        $member->update($validated);
+        return response()->json([
+            'status' => true,
+            'message' => 'Member updated',
+            'data' => $member
+        ]);
     }
 
     /**

@@ -57,7 +57,8 @@ class SessionController extends Controller
     public function store(SessionRequest $request)
     {
         //
-        if (!$token = JWTAuth::attempt($request->all())) {
+        $attr = $request->all();
+        if (!$token = JWTAuth::attempt($attr, $attr['remember'] ?? false)) {
             return response()->json(['status' => false, 'message' => 'Invalid Credentials']);
         }
 

@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
 import { Toaster } from "sonner";
 import { z } from "zod";
 import { ThemeToggle } from "../components/theme-toggle";
@@ -31,6 +30,7 @@ const loginSchema = z.object({
     .string()
     .min(6, { message: "password must be at least 6 characters" })
     .max(255),
+    remember: z.boolean().default(false),
 });
 
 type FormData = z.infer<typeof loginSchema>;
@@ -140,14 +140,26 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember"
+                  type="checkbox"
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  {...register("remember")}
+                />
+                <Label htmlFor="remember" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                  Remember me
+                </Label>
+              </div>
+
+              {/* <div className="flex items-center justify-between">
                 <Link
                   to="/forgot-password"
                   className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   Forgot password?
                 </Link>
-              </div>
+              </div> */}
 
               <Button
                 type="submit"

@@ -50,7 +50,7 @@ export default function MembersPage() {
       >
         <Button asChild>
           <Link to="/members/add">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             Add Member
           </Link>
         </Button>
@@ -59,9 +59,9 @@ export default function MembersPage() {
       <div className="px-4 sm:px-6 lg:px-8">
         <Card>
           <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-3/5   transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute top-3/5 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                 <Input
                   placeholder="Search members by name or email..."
                   className="pl-10"
@@ -69,13 +69,13 @@ export default function MembersPage() {
               </div>
             </div>
 
-            <div className="rounded-md border overflow-x-auto">
+            <div className="overflow-x-auto rounded-md border">
               {isLoading ? (
                 <div className="w-full">
                   <div>
-                    <Skeleton className="h-10 rounded mb-4" />
+                    <Skeleton className="mb-4 h-10 rounded" />
                     {Array.from({ length: 8 }).map((_, idx) => (
-                      <Skeleton key={idx} className="h-8 rounded mb-2" />
+                      <Skeleton key={idx} className="mb-2 h-8 rounded" />
                     ))}
                   </div>
                 </div>
@@ -104,7 +104,7 @@ export default function MembersPage() {
                               <div className="font-medium">{member.name}</div>
                               <div className="text-sm text-gray-500 md:hidden">
                                 <div className="flex items-center">
-                                  <Mail className="h-3 w-3 mr-1" />
+                                  <Mail className="mr-1 h-3 w-3" />
                                   {member.email}
                                 </div>
                               </div>
@@ -113,11 +113,11 @@ export default function MembersPage() {
                           <TableCell className="hidden md:table-cell">
                             <div className="space-y-1">
                               <div className="flex items-center text-sm">
-                                <Mail className="h-3 w-3 mr-1" />
+                                <Mail className="mr-1 h-3 w-3" />
                                 {member.email}
                               </div>
                               <div className="flex items-center text-sm text-gray-500">
-                                <Phone className="h-3 w-3 mr-1" />
+                                <Phone className="mr-1 h-3 w-3" />
                                 {member.phone}
                               </div>
                             </div>
@@ -130,12 +130,38 @@ export default function MembersPage() {
                               {member.checkouts.length}
                             </Badge>
                           </TableCell>
-                        <TableCell>{member.role[0].toUpperCase()+member.role.slice(1)}</TableCell>
+                          <TableCell>
+                            {member.role[0].toUpperCase() +
+                              member.role.slice(1)}
+                          </TableCell>
                           <TableCell>
                             <div className="flex space-x-2">
-                              <Button variant="ghost" size="icon">
-                                <Edit className="" />
-                              </Button>
+                              {user?.id === member.id ? (
+                                <Button
+                                  asChild
+                                  variant="ghost"
+                                  size="icon"
+                                  title="Edit your profile"
+                                >
+                                  <Link to="/settings">
+                                    <Edit />
+                                  </Link>
+                                </Button>
+                              ) : (
+                                <Button
+                                  asChild
+                                  variant="ghost"
+                                  size="icon"
+                                  title="Edit member"
+                                >
+                                  <Link
+                                    to={`/members/${member.id}/edit`}
+                                    state={{ member }}
+                                  >
+                                    <Edit />
+                                  </Link>
+                                </Button>
+                              )}
                               {user?.id !== member.id && (
                                 <Dialog open={open} onOpenChange={setOpen}>
                                   <DialogTrigger asChild>
@@ -148,7 +174,7 @@ export default function MembersPage() {
                                       <Trash2 className="h-3 w-3" />
                                     </Button>
                                   </DialogTrigger>
-                                  <DialogContent className="font-[poppins] w-fit">
+                                  <DialogContent className="w-fit font-[poppins]">
                                     <DialogHeader>
                                       <DialogTitle>
                                         Are you absolutely sure?

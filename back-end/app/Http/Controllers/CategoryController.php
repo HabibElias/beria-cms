@@ -34,7 +34,7 @@ class CategoryController extends Controller
             $attr = $request->validate(
                 [
                     'name' => 'required|min:1|max:200',
-                    'description' => 'sometimes|max:500'
+                    'description' => 'max:500'
                 ]
             );
         } catch (ValidationException $err) {
@@ -80,7 +80,7 @@ class CategoryController extends Controller
             $attr = $request->validate(
                 [
                     'name' => 'required|min:1|max:200',
-                    'description' => 'sometimes|max:500'
+                    'description' => 'max:500'
                 ]
             );
         } catch (ValidationException $err) {

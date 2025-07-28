@@ -11,10 +11,12 @@ import CheckoutsPage from "./pages/checkouts/CheckoutsPage";
 import Dashboard from "./pages/Dashboard";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import LoginPage from "./pages/LoginPage";
-import LogoutPage from "./pages/LogoutPage";
 import AddMemberPage from "./pages/Member/AddMemberPage";
 import MembersPage from "./pages/Member/MembersPage";
 import CategoriesPage from "./pages/categories/CategoriesPage";
+import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
+import EditMemberPage from "./pages/Member/EditMemberPage";
 
 const routes = createBrowserRouter([
   {
@@ -55,12 +57,24 @@ const routes = createBrowserRouter([
             element: <AddMemberPage />,
           },
           {
+            path: "/members/:id/edit",
+            element: <EditMemberPage />,
+          },
+          {
             path: "/checkouts",
             element: <CheckoutsPage />,
           },
           {
             path: "/categories",
             element: <CategoriesPage />,
+          },
+          {
+            path: "/profile",
+            element: <ProfilePage />,
+          },
+          {
+            path: "/settings",
+            element: <SettingsPage />,
           },
         ],
       },
@@ -73,10 +87,6 @@ const routes = createBrowserRouter([
       {
         path: "/login",
         element: <LoginPage />,
-      },
-      {
-        path: "/logout",
-        element: <LogoutPage />,
       },
       {
         path: "/forgot-password",
