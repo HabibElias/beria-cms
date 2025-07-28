@@ -1,4 +1,4 @@
-import { Clock, User } from "lucide-react";
+import { Clock, Loader2Icon, User } from "lucide-react";
 import { CardContent, Card } from "../ui/card";
 import type Checkout from "../../models/Checkout";
 import { useState } from "react";
@@ -6,12 +6,16 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import DeleteCheckout from "./DeleteCheckout";
 import useDeleteCheckout from "../../hooks/checkout/useDeleteCheckout";
+import useUpdateCheckout from "../../hooks/checkout/useUpdateCheckout";
 
 interface props {
   checkout: Checkout;
 }
 
 const CheckoutCard = ({ checkout }: props) => {
+  const { mutate: renewCheckout, isPending: isPendingRenewal } =
+    useUpdateCheckout();
+
   const getDaysRemainingColor = (daysRemaining: number) => {
     if (daysRemaining <= 0) return "text-red-600 dark:text-red-400";
     if (daysRemaining <= 3) return "text-orange-600 dark:text-orange-400";
@@ -109,9 +113,7 @@ const CheckoutCard = ({ checkout }: props) => {
           </div>
           <div className="flex justify-between text-xs">
             <span className="text-gray-500">Renewals:</span>
-            <span>
-              {checkout.renewal_number}/3
-            </span>
+            <span>{checkout.renewal_number}/3</span>
           </div>
         </div>
 
@@ -131,8 +133,19 @@ const CheckoutCard = ({ checkout }: props) => {
                 <DeleteCheckout isOnMenu checkout={checkout} />
               </Button>
               {checkout.renewal_number < 3 ? (
-                <Button variant="ghost" size="sm">
-                  Renew
+                <Button
+                  onClick={() => {
+                    renewCheckout({ id: checkout.id });
+                  }}
+                  variant="ghost"
+                  size="sm"
+                  disabled={isPendingRenewal}
+                >
+                  {isPendingRenewal ? (
+                    <Loader2Icon className="animate-spin" />
+                  ) : (
+                    "Renew"
+                  )}
                 </Button>
               ) : (
                 <span className="text-sm text-gray-500">Completed</span>

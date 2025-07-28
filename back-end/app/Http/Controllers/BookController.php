@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Category;
 use App\Models\Checkout;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class BookController extends Controller
@@ -70,6 +69,13 @@ class BookController extends Controller
                 'status' => false,
                 'errors' => $e->errors(),
             ], 422);
+        }
+
+        if (!Category::find($attr["category_id"])) {
+            return response()->json([
+                'status' => false,
+                'message' => 'category is not found',
+            ], 404);
         }
 
         Book::create($attr);

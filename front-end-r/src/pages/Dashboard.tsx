@@ -1,10 +1,15 @@
 import {
-  BookOpen,
-  Users,
-  Calendar,
-  TrendingUp,
   AlertCircle,
+  BookOpen,
+  Calendar,
+  Loader2Icon,
+  Users,
 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { PageHeader } from "../components/page-header";
+import { CheckoutBookDialog } from "../components/sidebar";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,14 +17,40 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { Badge } from "../components/ui/badge";
-import { PageHeader } from "../components/page-header";
-import { Link } from "react-router-dom";
-import { CheckoutBookDialog } from "../components/sidebar";
+import useAnalytics from "../hooks/useAnalytics";
 // import useCategories from "../hooks/useCategories";
 
 export default function Dashboard() {
+  const { data: analytics, isLoading } = useAnalytics();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen">
+        <Loader2Icon className="animate-spin" />
+      </div>
+    );
+  }
+
+  function formatTimeAgo(created_at: string): import("react").ReactNode {
+    const date = new Date(created_at);
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (seconds < 60) return "just now";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days} day${days > 1 ? "s" : ""} ago`;
+    const weeks = Math.floor(days / 7);
+    if (weeks < 4) return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months} month${months > 1 ? "s" : ""} ago`;
+    const years = Math.floor(days / 365);
+    return `${years} year${years > 1 ? "s" : ""} ago`;
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -36,10 +67,8 @@ export default function Dashboard() {
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">1,247</div>
-              <p className="text-xs text-muted-foreground">
-                +12 from last month
-              </p>
+              <div className="text-2xl font-bold">{analytics?.total_books}</div>
+              <p className="text-xs text-muted-foreground">total books</p>
             </CardContent>
           </Card>
 
@@ -51,10 +80,10 @@ export default function Dashboard() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">342</div>
-              <p className="text-xs text-muted-foreground">
-                +8 from last month
-              </p>
+              <div className="text-2xl font-bold">
+                {analytics?.total_members}
+              </div>
+              <p className="text-xs text-muted-foreground">total members</p>
             </CardContent>
           </Card>
 
@@ -66,8 +95,10 @@ export default function Dashboard() {
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">89</div>
-              <p className="text-xs text-muted-foreground">-3 from yesterday</p>
+              <div className="text-2xl font-bold">
+                {analytics?.total_checkouts}
+              </div>
+              <p className="text-xs text-muted-foreground">total checkouts</p>
             </CardContent>
           </Card>
 
@@ -79,8 +110,10 @@ export default function Dashboard() {
               <AlertCircle className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-destructive">7</div>
-              <p className="text-xs text-muted-foreground">2 need attention</p>
+              <div className="text-2xl font-bold text-destructive">
+                {analytics?.overdue_books}
+              </div>
+              <p className="text-xs text-muted-foreground">needs attention</p>
             </CardContent>
           </Card>
         </div>
@@ -98,61 +131,31 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {"'The Purpose Driven Life'"} returned
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        by Sarah Johnson • 2 hours ago
-                      </p>
+                  {analytics?.recent_activities && analytics.recent_activities.length > 0 ? (
+                    analytics.recent_activities.map((act, index) => (
+                      <div className="flex items-center" key={index}>
+                        <div
+                          className={`w-2 h-2 rounded-full mr-3 ${
+                            act.type === "checkout" ? "bg-blue-500" : "bg-green-500"
+                          }`}
+                        ></div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            "{act.book.title}" {act.type === "checkout" ? "checked out" : "returned"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {act.user.name} &middot; {formatTimeAgo(act.created_at)}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
+                      <Calendar className="h-8 w-8 mb-2 opacity-40" />
+                      <p className="text-sm font-semibold">No recent activity</p>
+                      <p className="text-xs">Check out or return a book to see activity here.</p>
                     </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {"'Jesus Calling'"} checked out
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        by Michael Davis • 4 hours ago
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {"'Mere Christianity'"} returned
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        by Emily Wilson • 6 hours ago
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {"'The Case for Christ'"} checked out
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        by David Brown • 1 day ago
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-destructive rounded-full mr-3"></div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {"'Crazy Love'"} is overdue
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        by Lisa Anderson • 1 day overdue
-                      </p>
-                    </div>
-                  </div>
+                  )}
                 </div>
                 <div className="mt-6">
                   <Button
@@ -177,50 +180,31 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">
-                        The Purpose Driven Life
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Rick Warren
-                      </p>
+                  {analytics?.popular_books.map(
+                    ({ book, borrow_count }, index) => (
+                      <div
+                        className="flex items-center justify-between"
+                        key={index}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">
+                            {book.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {book.author}
+                          </p>
+                        </div>
+                        <Badge variant="secondary">{borrow_count}</Badge>
+                      </div>
+                    )
+                  )}
+                    {(!analytics?.popular_books || analytics.popular_books.length === 0) && (
+                    <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
+                      <BookOpen className="h-8 w-8 mb-2 opacity-40" />
+                      <p className="text-sm font-semibold">No popular books yet</p>
+                      <p className="text-xs">Add books and check them out to see stats here.</p>
                     </div>
-                    <Badge variant="secondary">23</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">
-                        Jesus Calling
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Sarah Young
-                      </p>
-                    </div>
-                    <Badge variant="secondary">19</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">
-                        Mere Christianity
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        C.S. Lewis
-                      </p>
-                    </div>
-                    <Badge variant="secondary">16</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">
-                        The Case for Christ
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Lee Strobel
-                      </p>
-                    </div>
-                    <Badge variant="secondary">14</Badge>
-                  </div>
+                    )}
                 </div>
               </CardContent>
             </Card>
@@ -236,9 +220,13 @@ export default function Dashboard() {
               <CardContent>
                 <div className="space-y-2">
                   <div className="text-sm">
-                    <p className="font-medium">7 books are overdue</p>
+                    <p className="font-medium">
+                      {analytics?.overdue_books ?? 0}{" "}
+                      {(analytics?.overdue_books ?? 0) > 1 ? "books" : "book"}{" "}
+                      overdue
+                    </p>
                     <p className="text-muted-foreground">
-                      2 members need to be contacted
+                      members need to be contacted
                     </p>
                   </div>
                   <Button
@@ -265,7 +253,7 @@ export default function Dashboard() {
               <CardDescription>Common tasks and shortcuts</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                 <Button asChild className="h-20 flex-col">
                   <Link to="/books/add">
                     <BookOpen className="h-6 w-6 mb-2" />
@@ -291,16 +279,6 @@ export default function Dashboard() {
                   <Link to="/members/add">
                     <Users className="h-6 w-6 mb-2" />
                     Add Member
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="h-20 flex-col bg-transparent"
-                >
-                  <Link to="/reports">
-                    <TrendingUp className="h-6 w-6 mb-2" />
-                    Reports
                   </Link>
                 </Button>
               </div>

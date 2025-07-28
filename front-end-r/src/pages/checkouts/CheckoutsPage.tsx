@@ -1,19 +1,9 @@
-import {
-  BookOpen,
-  Calendar,
-  Clock,
-  Grid,
-  List,
-  Loader2Icon,
-  Mail,
-  Phone,
-  Plus,
-  Search,
-  User,
-} from "lucide-react";
+import { Calendar, Grid, List, Loader2Icon, Plus, Search } from "lucide-react";
 import { useState } from "react";
+import CheckoutCard from "../../components/BooksPage/CheckoutCard";
+import CheckoutRow from "../../components/checkout/CheckoutRow";
 import { PageHeader } from "../../components/page-header";
-import { Badge } from "../../components/ui/badge";
+import { CheckoutBookDialog } from "../../components/sidebar";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
@@ -27,7 +17,6 @@ import {
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -35,10 +24,6 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import useCheckouts from "../../hooks/checkout/useCheckouts";
 import type Checkout from "../../models/Checkout";
-import { CheckoutBookDialog } from "../../components/sidebar";
-import useDeleteCheckout from "../../hooks/checkout/useDeleteCheckout";
-import DeleteCheckout from "../../components/BooksPage/DeleteCheckout";
-import CheckoutCard from "../../components/BooksPage/CheckoutCard";
 
 type ViewMode = "table" | "cards";
 
@@ -46,16 +31,13 @@ export default function CheckoutsPage() {
   const { data: checkouts, isLoading } = useCheckouts();
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
 
-  const { mutate, isPending } = useDeleteCheckout();
+  const params = new URLSearchParams(window.location.search);
+  const filter = params.get("filter");
 
-  const getDaysRemainingColor = (daysRemaining: number) => {
-    if (daysRemaining <= 0) return "text-red-600 dark:text-red-400";
-    if (daysRemaining <= 3) return "text-orange-600 dark:text-orange-400";
-    if (daysRemaining <= 7) return "text-yellow-600 dark:text-yellow-400";
-    return "text-green-600 dark:text-green-400";
-  };
+  const [statusFilter, setStatusFilter] = useState(
+    filter === "overdue" ? "false" : "all",
+  );
 
   const getDaysRemaining = (checkout: Checkout) => {
     const now = new Date();
@@ -64,7 +46,7 @@ export default function CheckoutsPage() {
       : null;
     const daysRemaining = returnDate
       ? Math.ceil(
-          (returnDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+          (returnDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
         )
       : 0;
 
@@ -88,7 +70,7 @@ export default function CheckoutsPage() {
 
   if (isLoading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center">
+      <div className="flex h-screen w-full items-center justify-center">
         <Loader2Icon className="animate-spin" />
       </div>
     );
@@ -115,7 +97,7 @@ export default function CheckoutsPage() {
           <CheckoutBookDialog
             childButton={
               <Button>
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="mr-2 h-4 w-4" />
                 New Check-out
               </Button>
             }
@@ -127,9 +109,9 @@ export default function CheckoutsPage() {
         <Card>
           <CardContent className="p-6">
             {/* Search and Filters */}
-            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-6">
+            <div className="mb-6 flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-3/5 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="top-3/5 absolute left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                 <Input
                   placeholder="Search by member name, book title, or email..."
                   className="pl-10"
@@ -161,7 +143,7 @@ export default function CheckoutsPage() {
 
             {/* Table View */}
             {viewMode === "table" && (
-              <div className="rounded-md border overflow-x-auto">
+              <div className="overflow-x-auto rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -183,116 +165,11 @@ export default function CheckoutsPage() {
                       const daysRemaining = getDaysRemaining(checkout);
 
                       return (
-                        <TableRow key={checkout.id}>
-                          <TableCell>
-                            <div className="flex items-center">
-                              <User className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
-                              <div className="min-w-0">
-                                <div className="font-medium truncate">
-                                  {checkout.user.name}
-                                </div>
-                                <div className="text-sm flex items-center gap-2 text-gray-500 truncate ">
-                                  <Mail size={15} />
-                                  {checkout.user.email}
-                                </div>
-                                <div className="text-sm flex items-center gap-2 text-gray-500 truncate">
-                                  <Phone size={15} />
-                                  {checkout.user.phone}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center">
-                              <BookOpen className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
-                              <div className="min-w-0">
-                                <div className="font-medium truncate">
-                                  {checkout.book.title}
-                                </div>
-                                <div className="text-sm text-gray-500 truncate">
-                                  {checkout.book.title}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            <div className="flex items-center">
-                              <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                              {new Date(
-                                checkout.created_at
-                              ).toLocaleDateString()}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center">
-                              <Clock className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
-                              <div>
-                                {(() => {
-                                  return (
-                                    <div
-                                      className={`text-xs ${getDaysRemainingColor(
-                                        daysRemaining
-                                      )}`}
-                                    >
-                                      {daysRemaining <= 0
-                                        ? `${Math.abs(
-                                            daysRemaining
-                                          )} days overdue`
-                                        : `${daysRemaining} days left`}
-                                    </div>
-                                  );
-                                })()}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={
-                                !(daysRemaining <= 0)
-                                  ? "default"
-                                  : "destructive"
-                              }
-                            >
-                              {!(daysRemaining <= 0) ? "Active" : "Overdue"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="hidden lg:table-cell">
-                            <span className="text-sm text-gray-600">
-                              {checkout.renewal_number}/3
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              {
-                                <>
-                                  <Button
-                                    onClick={() => {
-                                      mutate({ id: checkout.id });
-                                    }}
-                                    variant="outline"
-                                    disabled={isPending}
-                                    size="sm"
-                                    asChild
-                                  >
-                                    <DeleteCheckout
-                                      isOnMenu
-                                      checkout={checkout}
-                                    />
-                                  </Button>
-                                  {checkout.renewal_number < 3 ? (
-                                    <Button variant="ghost" size="sm">
-                                      Renew
-                                    </Button>
-                                  ) : (
-                                    <span className="text-sm text-gray-500">
-                                      Completed
-                                    </span>
-                                  )}
-                                </>
-                              }
-                            </div>
-                          </TableCell>
-                        </TableRow>
+                        <CheckoutRow
+                          checkout={checkout}
+                          daysRemaining={daysRemaining}
+                          key={checkout.id}
+                        />
                       );
                     })}
                   </TableBody>
@@ -302,7 +179,7 @@ export default function CheckoutsPage() {
 
             {/* Card View */}
             {viewMode === "cards" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredCheckouts?.map((checkout) => (
                   <CheckoutCard key={checkout.id} checkout={checkout} />
                 ))}
@@ -311,12 +188,12 @@ export default function CheckoutsPage() {
 
             {/* Empty state */}
             {filteredCheckouts?.length === 0 && (
-              <div className="text-center py-12">
-                <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <div className="py-12 text-center">
+                <Calendar className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                <h3 className="mb-2 text-lg font-medium text-gray-900">
                   No check-outs found
                 </h3>
-                <p className="text-gray-500 mb-4">
+                <p className="mb-4 text-gray-500">
                   {searchTerm || statusFilter !== "all"
                     ? "Try adjusting your search or filters"
                     : "No books are currently checked out"}
@@ -324,7 +201,7 @@ export default function CheckoutsPage() {
                 <CheckoutBookDialog
                   childButton={
                     <Button>
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus className="mr-2 h-4 w-4" />
                       New Check-out
                     </Button>
                   }

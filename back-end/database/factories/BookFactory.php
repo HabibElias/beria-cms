@@ -29,7 +29,7 @@ class BookFactory extends Factory
             'condition' => ['excellent', 'good', 'bad'][random_int(0, 2)],
             'location' => strtoupper(fake()->randomLetter()) . "-" . fake()->randomDigit(),
             'pages' => fake()->numberBetween(100, 500),
-            'is_available' => fake()->boolean(70),
+            'is_available' => true,
             // 'book_img' => fake()->imageUrl()
             'published_year' => fake()->year('now')
         ];

@@ -1,15 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { queryClient } from "../../main";
 import apiClient from "../../services/Apiclient";
-import type { z } from "zod";
-import type BookSchema from "../../models/BookSchema";
 
-type FormData = z.infer<typeof BookSchema>;
+const useDeleteCategory = () => {
+  return useMutation<unknown, Error, { id: number }>({
+    mutationFn: async ({ id }) => {
+      const response = await apiClient.delete(`/categories/${id}`);
 
-const useAddBooks = () => {
-  return useMutation<unknown, Error, FormData>({
-    mutationFn: async (data: FormData) => {
-      const response = await apiClient.post("/books", data);
+      toast.success(response.data.message)
       return response.data;
     },
     onError: (error: any) => {
@@ -20,7 +19,10 @@ const useAddBooks = () => {
         }
       } else toast.error("Error Occurred Try again");
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
   });
 };
 
-export default useAddBooks;
+export default useDeleteCategory;

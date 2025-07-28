@@ -1,20 +1,20 @@
 import { createBrowserRouter } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
+import ErrorPage from "./components/error-page";
+import FormLayout from "./components/form-layout";
+import Layout from "./components/layout";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 import AddBookPage from "./pages/Book/AddBookPage";
+import BookPage from "./pages/Book/BookPage";
 import BooksPage from "./pages/Book/BooksPage";
+import UpdateBookPage from "./pages/Book/UpdateBookPage";
 import CheckoutsPage from "./pages/checkouts/CheckoutsPage";
+import Dashboard from "./pages/Dashboard";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import LoginPage from "./pages/LoginPage";
 import LogoutPage from "./pages/LogoutPage";
-import MembersPage from "./pages/Member/MembersPage";
-import ReportsPage from "./pages/ReportsPage";
-import Layout from "./components/layout";
-import ProtectedRoutes from "./components/ProtectedRoutes";
-import ErrorPage from "./components/error-page";
-import FormLayout from "./components/form-layout";
-import BookPage from "./pages/Book/BookPage";
-import UpdateBookPage from "./pages/Book/UpdateBookPage";
 import AddMemberPage from "./pages/Member/AddMemberPage";
+import MembersPage from "./pages/Member/MembersPage";
+import CategoriesPage from "./pages/categories/CategoriesPage";
 
 const routes = createBrowserRouter([
   {
@@ -59,8 +59,8 @@ const routes = createBrowserRouter([
             element: <CheckoutsPage />,
           },
           {
-            path: "/reports",
-            element: <ReportsPage />,
+            path: "/categories",
+            element: <CategoriesPage />,
           },
         ],
       },

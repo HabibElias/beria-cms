@@ -1,15 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import apiClient from "../../services/Apiclient";
-import type { z } from "zod";
-import type BookSchema from "../../models/BookSchema";
+import type { categoryFormData } from "../../models/CategorySchema";
+import { queryClient } from "../../main";
 
-type FormData = z.infer<typeof BookSchema>;
-
-const useAddBooks = () => {
-  return useMutation<unknown, Error, FormData>({
-    mutationFn: async (data: FormData) => {
-      const response = await apiClient.post("/books", data);
+const useUpdateCategory = () => {
+  return useMutation<unknown, Error, { id: number; data: categoryFormData }>({
+    mutationFn: async ({ id, data }) => {
+      const response = await apiClient.patch(`/categories/${id}`, data);
       return response.data;
     },
     onError: (error: any) => {
@@ -20,7 +18,10 @@ const useAddBooks = () => {
         }
       } else toast.error("Error Occurred Try again");
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
   });
 };
 
-export default useAddBooks;
+export default useUpdateCategory;

@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\ReportController;
 use App\Models\Book;
 use Illuminate\Support\Facades\Route;
 
@@ -27,9 +28,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('books/{book}', [BookController::class, 'destroy'])->can('admin', Book::class);
 
     // Categories
-    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('categories', CategoryController::class)->only(['index','update','store', 'destroy']);
 
-    // Members
+    // Members  
     Route::get('members', [MemberController::class, 'index']);
     Route::get('members/{member}', [MemberController::class, 'show']);
     Route::post('members', [MemberController::class, 'store']);
@@ -40,4 +41,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('checkouts/{checkout}', [CheckoutController::class, 'show']);
     Route::post('checkouts', [CheckoutController::class, 'store']);
     Route::delete('checkouts/{checkout}', [CheckoutController::class, 'destroy']);
+    Route::patch('checkouts/{checkout}', [CheckoutController::class, 'update']);
+
+    // Dashboard Analytics
+    Route::get('analytics', [ReportController::class, 'index']);
 });

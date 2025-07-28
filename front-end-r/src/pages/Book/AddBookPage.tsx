@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2Icon } from "lucide-react";
+import { ArrowLeft, Loader2Icon, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { z } from "zod";
@@ -24,10 +24,11 @@ import { Textarea } from "../../components/ui/textarea";
 import BookSchema from "../../models/BookSchema";
 import { toast } from "sonner";
 import useAddBooks from "../../hooks/book/useAddBooks";
-import useCategories from "../../hooks/useCategories";
+import useCategories from "../../hooks/category/useCategories";
 import { Skeleton } from "../../components/ui/skeleton";
 import { useState } from "react";
 import { supabase } from "../../config/supabase";
+import CategoryAddDialog from "../../components/category/category-add-dialog";
 
 type FormData = z.infer<typeof BookSchema>;
 
@@ -42,10 +43,6 @@ export default function AddBookPage() {
     watch,
   } = useForm({
     resolver: zodResolver(BookSchema),
-    defaultValues: {
-      condition: "excellent",
-      category_id: 1,
-    },
   });
 
   const condition = watch("condition");
@@ -122,14 +119,14 @@ export default function AddBookPage() {
       >
         <Button variant="outline" asChild>
           <Link to="/books">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Books
           </Link>
         </Button>
       </PageHeader>
 
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
+        <div className="mx-auto max-w-3xl">
           <Card>
             <CardHeader>
               <CardTitle>Book Information</CardTitle>
@@ -167,7 +164,7 @@ export default function AddBookPage() {
                       {...register("title")}
                     />
                     {errors.title && (
-                      <div className="text-xs mt-2 text-red-400">
+                      <div className="mt-2 text-xs text-red-400">
                         <p>{errors.title.message}</p>
                       </div>
                     )}
@@ -182,7 +179,7 @@ export default function AddBookPage() {
                       {...register("author")}
                     />
                     {errors.author && (
-                      <div className="text-xs mt-2 text-red-400">
+                      <div className="mt-2 text-xs text-red-400">
                         <p>{errors.author.message}</p>
                       </div>
                     )}
@@ -198,7 +195,7 @@ export default function AddBookPage() {
                       {...register("publisher")}
                     />
                     {errors.publisher && (
-                      <div className="text-xs mt-2 text-red-400">
+                      <div className="mt-2 text-xs text-red-400">
                         <p>{errors.publisher.message}</p>
                       </div>
                     )}
@@ -214,7 +211,7 @@ export default function AddBookPage() {
                       {...register("published_year")}
                     />
                     {errors.published_year && (
-                      <div className="text-xs mt-2 text-red-400">
+                      <div className="mt-2 text-xs text-red-400">
                         <p>{errors.published_year.message}</p>
                       </div>
                     )}
@@ -230,7 +227,7 @@ export default function AddBookPage() {
                       {...register("pages")}
                     />
                     {errors.pages && (
-                      <div className="text-xs mt-2 text-red-400">
+                      <div className="mt-2 text-xs text-red-400">
                         <p>{errors.pages.message}</p>
                       </div>
                     )}
@@ -248,7 +245,7 @@ export default function AddBookPage() {
                       {...register("location")}
                     />
                     {errors.location && (
-                      <div className="text-xs mt-2 text-red-400">
+                      <div className="mt-2 text-xs text-red-400">
                         <p>{errors.location.message}</p>
                       </div>
                     )}
@@ -262,7 +259,7 @@ export default function AddBookPage() {
                       onValueChange={(value) =>
                         setValue(
                           "condition",
-                          value as "excellent" | "good" | "bad"
+                          value as "excellent" | "good" | "bad",
                         )
                       }
                     >
@@ -276,7 +273,7 @@ export default function AddBookPage() {
                       </SelectContent>
                     </Select>
                     {errors.condition && (
-                      <div className="text-xs mt-2 text-red-400">
+                      <div className="mt-2 text-xs text-red-400">
                         <p>{errors.condition.message}</p>
                       </div>
                     )}
@@ -286,28 +283,42 @@ export default function AddBookPage() {
                       Category <span className="text-red-400">*</span>
                     </Label>
                     {!catIsLoading ? (
-                      <Select
-                        value={category_id?.toString()}
-                        onValueChange={(value) =>
-                          setValue("category_id", Number(value))
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories?.map((cat) => (
-                            <SelectItem key={cat.id} value={String(cat.id)}>
-                              {cat.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      categories?.length == 0 ? (
+                        <CategoryAddDialog
+                          childButton={
+                            <Button
+                              className="mt-3 cursor-pointer"
+                              type="button"
+                            >
+                              <Plus />
+                              Add Category
+                            </Button>
+                          }
+                        />
+                      ) : (
+                        <Select
+                          value={category_id?.toString()}
+                          onValueChange={(value) =>
+                            setValue("category_id", Number(value))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories?.map((cat) => (
+                              <SelectItem key={cat.id} value={String(cat.id)}>
+                                {cat.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )
                     ) : (
-                      <Skeleton className="w-1/2 h-10 rounded-md" />
+                      <Skeleton className="h-10 w-1/2 rounded-md" />
                     )}
                     {errors.category_id && (
-                      <div className="text-xs mt-2 text-red-400">
+                      <div className="mt-2 text-xs text-red-400">
                         <p>{errors.category_id.message}</p>
                       </div>
                     )}
@@ -325,7 +336,7 @@ export default function AddBookPage() {
                     {...register("description")}
                   />
                   {errors.description && (
-                    <div className="text-xs mt-2 text-red-400">
+                    <div className="mt-2 text-xs text-red-400">
                       <p>{errors.description.message}</p>
                     </div>
                   )}
@@ -340,13 +351,13 @@ export default function AddBookPage() {
                     {...register("notes")}
                   />
                   {errors.notes && (
-                    <div className="text-xs mt-2 text-red-400">
+                    <div className="mt-2 text-xs text-red-400">
                       <p>{errors.notes.message}</p>
                     </div>
                   )}
                 </div>
 
-                <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-4 space-y-4 space-y-reverse sm:space-y-0">
+                <div className="flex flex-col-reverse space-y-4 space-y-reverse sm:flex-row sm:justify-end sm:space-x-4 sm:space-y-0">
                   <Button variant="outline" asChild>
                     <Link to="/books">Cancel</Link>
                   </Button>

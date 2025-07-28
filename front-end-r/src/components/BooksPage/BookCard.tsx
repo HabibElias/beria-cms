@@ -59,7 +59,7 @@ const BookCard = ({ book }: { book: Book }) => {
           <p className="text-sm text-gray-600">by {book.author}</p>
 
           <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>{book.category.name}</span>
+            <span>{book.category?.name ?? ""}</span>
             <span>{book.pages} pages</span>
           </div>
 

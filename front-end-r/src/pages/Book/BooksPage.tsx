@@ -18,16 +18,19 @@ import {
 import { Skeleton } from "../../components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import useBooks from "../../hooks/book/useBooks";
-import useCategories from "../../hooks/useCategories";
+import useCategories from "../../hooks/category/useCategories";
 import useDebounce from "../../hooks/useDebounce";
 type ViewMode = "table" | "cards";
 
 export default function BooksPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
+
+  const params = new URLSearchParams(window.location.search);
+  const cat_id = params.get("category_id");
+  const [categoryFilter, setCategoryFilter] = useState(cat_id ? cat_id : "all");
 
   const { data: categories, isLoading: catIsLoading } = useCategories();
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
@@ -72,7 +75,7 @@ export default function BooksPage() {
           </ToggleGroup>
           <Button asChild>
             <Link to="/books/add">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Add Book
             </Link>
           </Button>
@@ -83,9 +86,9 @@ export default function BooksPage() {
         <Card>
           <CardContent className="p-6">
             {/* Search and Filters */}
-            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-6">
+            <div className="mb-6 flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-3/5 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="top-3/5 absolute left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                 <Input
                   placeholder="Search books by title, author, or ISBN..."
                   className="pl-10"
@@ -96,7 +99,7 @@ export default function BooksPage() {
                   }}
                 />
               </div>
-              <div className="flex space-x-2 items-end">
+              <div className="flex items-end space-x-2">
                 {!catIsLoading ? (
                   <Select
                     value={categoryFilter}
@@ -118,7 +121,7 @@ export default function BooksPage() {
                     </SelectContent>
                   </Select>
                 ) : (
-                  <div className="bg-neutral-800 w-35 rounded-md h-10"></div>
+                  <div className="w-35 h-10 rounded-md bg-neutral-800"></div>
                 )}
                 <Select
                   value={statusFilter}
@@ -141,7 +144,7 @@ export default function BooksPage() {
 
             {booksIsLoading ? (
               viewMode === "cards" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {Array.from({ length: 12 }).map((_, index) => (
                     <BookSkeleton key={index} />
                   ))}
@@ -149,9 +152,9 @@ export default function BooksPage() {
               ) : (
                 <div className="w-full">
                   <div>
-                    <Skeleton className="h-10 rounded mb-4" />
+                    <Skeleton className="mb-4 h-10 rounded" />
                     {Array.from({ length: 8 }).map((_, idx) => (
-                      <Skeleton key={idx} className="h-8 rounded mb-2" />
+                      <Skeleton key={idx} className="mb-2 h-8 rounded" />
                     ))}
                   </div>
                 </div>
@@ -173,7 +176,7 @@ export default function BooksPage() {
 
                 {/* Card View */}
                 {viewMode === "cards" && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                     {books?.data?.map((book) => (
                       <BookCard book={book} key={book.id} />
                     ))}
@@ -182,12 +185,12 @@ export default function BooksPage() {
 
                 {/* Empty state */}
                 {books?.data?.length === 0 && (
-                  <div className="text-center py-12">
-                    <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <div className="py-12 text-center">
+                    <BookOpen className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                    <h3 className="mb-2 text-lg font-medium text-gray-900">
                       No books found
                     </h3>
-                    <p className="text-gray-500 mb-4">
+                    <p className="mb-4 text-gray-500">
                       {searchTerm ||
                       categoryFilter !== "all" ||
                       statusFilter !== "all"
@@ -196,7 +199,7 @@ export default function BooksPage() {
                     </p>
                     <Button asChild>
                       <Link to="/books/add">
-                        <Plus className="h-4 w-4 mr-2" />
+                        <Plus className="mr-2 h-4 w-4" />
                         Add Book
                       </Link>
                     </Button>
@@ -205,7 +208,7 @@ export default function BooksPage() {
 
                 {/* Pagination controls */}
                 {books?.data && books?.data?.length > 0 && (
-                  <div className="flex justify-between items-center mt-4">
+                  <div className="mt-4 flex items-center justify-between">
                     <Button
                       variant="outline"
                       size="sm"

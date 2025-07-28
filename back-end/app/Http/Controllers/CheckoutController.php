@@ -106,9 +106,53 @@ class CheckoutController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Checkout $checkout)
+    public function update(Checkout $checkout)
     {
-        //
+        if (!$checkout) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Checkout not found',
+                ],
+                404
+            );
+        }
+
+
+
+        $checkoutAttr = $checkout->attributesToArray();
+
+        if ($checkoutAttr['renewal_number'] >= 3)
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Checkout is not renewable',
+                ],
+                403
+            );
+        else if (strtotime($checkoutAttr['return_date']) > strtotime(now()->toDateString())) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Checkout is not renewable',
+                ],
+                403
+            );
+        } else {
+            $checkoutAttr['renewal_number']++;
+            $checkoutAttr['return_date'] =  now()->addWeek()->toDateString();
+        }
+
+        $checkout->update($checkoutAttr);
+        $checkout->save();
+
+        return response()->json(
+            [
+                'status' => true,
+                'message' => 'Checkout Renewal Successful',
+            ],
+            200
+        );
     }
 
     /**
@@ -124,6 +168,11 @@ class CheckoutController extends Controller
         $attr = $checkout->attributesToArray();
         BookReturn::create(array_slice($attr, 1));
 
+
+        // make the book available
+        $book = Book::find($attr['book_id']);
+        $book->is_available = true;
+        $book->save();
 
         $checkout->delete();
         return response()->json(['status' => true, 'message' => 'checkout deleted']);

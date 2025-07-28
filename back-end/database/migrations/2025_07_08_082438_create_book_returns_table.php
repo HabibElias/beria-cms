@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('book_returns', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Book::class);
-            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(Book::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->timestamp('return_date');
             $table->integer('renewal_number')->default(0);
             $table->timestamps();

@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('location');
             $table->string('publisher')->nullable();
             $table->integer('published_year')->nullable();
-            $table->foreignIdFor(Category::class);
+            $table->foreignIdFor(Category::class)->cascadeOnDelete();
             $table->boolean('is_available')->default(true);
             $table->enum('condition', ['excellent', 'good', 'bad']);
             $table->string('book_img')->nullable();

@@ -1,22 +1,25 @@
-import { useState, type ReactNode } from "react";
 import {
+  BookAIcon,
   BookOpen,
-  LayoutDashboard,
-  Users,
   Calendar,
-  BarChart3,
-  Settings,
+  CalendarPlusIcon,
+  LayoutDashboard,
   Menu,
-  X,
   Plus,
   Search,
-  CalendarPlusIcon,
+  Settings,
+  Users,
+  X
 } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { ThemeToggle } from "../components/theme-toggle";
-import { cn } from "../lib/utils";
-import { UserMenu } from "../components/user-menu";
+import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { ThemeToggle } from "../components/theme-toggle";
+import { Button } from "../components/ui/button";
+import { UserMenu } from "../components/user-menu";
+import { cn } from "../lib/utils";
+import type Book from "../models/Book";
+import { useAuth } from "../provider/AuthProvider";
+import { CheckoutForm } from "./BooksPage/CheckoutForm";
 import {
   Dialog,
   DialogContent,
@@ -25,16 +28,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { useAuth } from "../provider/AuthProvider";
-import type Book from "../models/Book";
-import { CheckoutForm } from "./BooksPage/CheckoutForm";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Books", href: "/books", icon: BookOpen },
   { name: "Members", href: "/members", icon: Users },
   { name: "Check-outs", href: "/checkouts", icon: Calendar },
-  { name: "Reports", href: "/reports", icon: BarChart3 },
+  { name: "Categories", href: "/categories", icon: BookAIcon },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
