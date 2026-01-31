@@ -51,14 +51,13 @@ export default function UpdateBookPage() {
 
   const navigate = useNavigate();
 
-  if (!id) return <NotFound />;
-
+  
   // getting the book from the db
-  const { data: book, isLoading } = useBook(id);
+  const { data: book, isLoading } = useBook(id??"");
 
   const condition = watch("condition") ?? book?.condition;
   const category_id =
-    watch("category_id") ??
+  watch("category_id") ??
     (book?.category?.id ? String(book.category.id) : "");
   const [bookImg, setBookImg] = useState<string | null>(null);
   const [isPending, setIsPending] = useState<boolean>(false);
@@ -150,7 +149,9 @@ export default function UpdateBookPage() {
         if (fields[key]) setValue(key, fields[key]);
       });
     }
-  }, [book]);
+  }, [book, setValue]);
+
+  if (!id) return <NotFound />;
 
   if (isLoading || catIsLoading)
     return (
