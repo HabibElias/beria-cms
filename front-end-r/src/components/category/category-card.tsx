@@ -1,6 +1,6 @@
-import { DialogClose } from "@radix-ui/react-dialog";
-import { Edit, Loader2Icon, Plus, Trash } from "lucide-react";
+import { ArrowUpRight, Edit, Loader2, Trash2 } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import useDeleteCategory from "../../hooks/category/useDeleteCategory";
 import type Category from "../../models/Category";
 import { Button } from "../ui/button";
@@ -14,35 +14,28 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import CategoryUpdateDialog from "./category-update-dialog";
-import { useNavigate } from "react-router-dom";
 
-const CategoryCard = ({ cat }: { cat: Category & { book_count: number } }) => {
-  const { isPending: isPendingDelete } = useDeleteCategory();
-  const navigate = useNavigate();
+type LibraryCategory = Category & { book_count: number };
 
+export default function CategoryCard({ cat }: { cat: LibraryCategory }) {
   return (
-    <div className="hover:-translate-1 group flex cursor-pointer flex-col rounded-lg border p-4 shadow-sm duration-200 dark:bg-white/10">
-      <div
-        onClick={() => navigate(`/books?category_id=${cat.id}`)}
-        className="mb-2 text-lg font-semibold group-hover:underline"
-      >
-        {cat.name[0].toUpperCase() + cat.name.slice(1)}
-      </div>
-      <div className="text-xs text-gray-500">
-        {cat.description ?? "No description"}
-      </div>
-      <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
-        Books : {cat.book_count}
-        <div>
+    <article className="category-card">
+      <div className="flex items-start justify-between gap-3">
+        <Link to={`/books?category_id=${cat.id}`} className="category-name">
+          {cat.name}
+          <ArrowUpRight size={16} />
+        </Link>
+        <div className="flex">
           <CategoryUpdateDialog
             cat={cat}
             childButton={
               <Button
-                variant={"ghost"}
-                className="cursor-pointer"
-                size={"icon"}
+                variant="ghost"
+                size="icon"
+                className="size-8"
+                aria-label={`Edit ${cat.name}`}
               >
-                <Edit />
+                <Edit size={14} />
               </Button>
             }
           />
@@ -50,73 +43,70 @@ const CategoryCard = ({ cat }: { cat: Category & { book_count: number } }) => {
             cat={cat}
             childButton={
               <Button
-                variant={"ghost"}
-                className="cursor-pointer"
-                disabled={isPendingDelete}
-                size={"icon"}
+                variant="ghost"
+                size="icon"
+                className="size-8"
+                aria-label={`Delete ${cat.name}`}
               >
-                {isPendingDelete ? (
-                  <Loader2Icon className="animate-spin" />
-                ) : (
-                  <Trash />
-                )}
+                <Trash2 size={14} />
               </Button>
             }
           />
         </div>
       </div>
-    </div>
+      <p>{cat.description || "A little room for books to belong."}</p>
+      <Link className="category-count" to={`/books?category_id=${cat.id}`}>
+        <span>{cat.book_count ?? 0}</span>{" "}
+        {(cat.book_count ?? 0) === 1 ? "book" : "books"}
+        <ArrowUpRight size={14} />
+      </Link>
+    </article>
   );
-};
-
-export default CategoryCard;
+}
 
 export function CategoryDeleteDialog({
   cat,
   childButton,
 }: {
-  cat: Category & { book_count: number };
+  cat: LibraryCategory;
   childButton?: ReactNode;
 }) {
-  const [open, setOpen] = useState<boolean>(false);
-  const { mutate: deleteCategory, isPending } = useDeleteCategory();
-
+  const [open, setOpen] = useState(false);
+  const { mutate, isPending } = useDeleteCategory();
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {childButton ?? (
-          <Button className="flex w-full cursor-pointer items-center justify-start rounded-md px-2 py-2 text-sm font-medium transition-colors">
-            <Plus className="mr-3 h-4 w-4 flex-shrink-0" />
-            Add Category
-          </Button>
-        )}
+        {childButton ?? <Button variant="outline">Delete category</Button>}
       </DialogTrigger>
-      <DialogContent className="font-[poppins]">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogTitle>Delete “{cat.name}”?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your
-            categorized books data from our servers.
+            This permanently deletes the category and its {cat.book_count ?? 0}{" "}
+            {(cat.book_count ?? 0) === 1 ? "book" : "books"}. Move any books you
+            want to keep to another category first. This cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose disabled={isPending} asChild>
-            <Button variant={"ghost"}>Cancel</Button>
-          </DialogClose>
           <Button
-            variant={"destructive"}
-            onClick={() => {
-              deleteCategory(
-                { id: cat.id },
-                {
-                  onSettled: () => {
-                    setOpen(false);
-                  },
-                },
-              );
-            }}
+            variant="outline"
+            disabled={isPending}
+            onClick={() => setOpen(false)}
           >
-            {isPending ? <Loader2Icon className="animate-spin" /> : "Continue"}
+            Keep category
+          </Button>
+          <Button
+            variant="destructive"
+            disabled={isPending}
+            onClick={() =>
+              mutate({ id: cat.id }, { onSuccess: () => setOpen(false) })
+            }
+          >
+            {isPending ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              "Delete category"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,72 +1,71 @@
-import { FolderCheckIcon, Loader2Icon } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { useState } from "react";
-import useDeleteCheckout from "../../hooks/checkout/useDeleteCheckout";
 import type Checkout from "../../models/Checkout";
+import useDeleteCheckout from "../../hooks/checkout/useDeleteCheckout";
 import { Button } from "../ui/button";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "../ui/dialog";
 
-const DeleteCheckout = ({ checkout, isOnMenu }: { isOnMenu?: boolean; checkout: Checkout }) => {
-  const { mutate: DeleteCheckout, isPending } = useDeleteCheckout();
-  const [open, setOpen] = useState<boolean>(false);
-
+export default function DeleteCheckout({
+  checkout,
+  isOnMenu,
+}: {
+  checkout: Checkout;
+  isOnMenu?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const { mutate, isPending } = useDeleteCheckout();
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          onClick={() => setOpen(true)}
           size="sm"
-          title="Delete checkout"
-          className={`${isOnMenu ? "flex items-center justify-start -pl-2" : ""}`}
+          aria-label={`Return ${checkout.book.title}`}
+          title="Record book return"
         >
-          <FolderCheckIcon className={`${isOnMenu ? "h-4 w-4 dark:text-white/70 text-black/40" : "h-4 w-4"}`} />
+          <Check size={14} />
           {isOnMenu && "Return"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="font-[poppins]">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogTitle>Welcome this book home?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete this checkout data from our servers.
+            Confirm that {checkout.user.name} has returned “
+            {checkout.book.title}”. It will become available for the next
+            reader.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose
-            onClick={() => {
-              setOpen(false);
-            }}
-            asChild
-          >
-            <Button variant={"ghost"}>Cancel</Button>
-          </DialogClose>
           <Button
-            variant={"destructive"}
-            onClick={() => {
-              DeleteCheckout(
-                { id: checkout.id },
-                {
-                  onSettled: () => {
-                    setOpen(false);
-                  },
-                }
-              );
-            }}
+            variant="outline"
+            disabled={isPending}
+            onClick={() => setOpen(false)}
           >
-            {isPending ? <Loader2Icon className="animate-spin" /> : "Continue"}
+            Not yet
+          </Button>
+          <Button
+            disabled={isPending}
+            onClick={() =>
+              mutate({ id: checkout.id }, { onSuccess: () => setOpen(false) })
+            }
+          >
+            {isPending ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              "Confirm return"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-};
-
-export default DeleteCheckout;
+}

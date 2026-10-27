@@ -1,140 +1,93 @@
-import {
-  BookOpen,
-  Calendar,
-  Clock,
-  Loader2Icon,
-  Mail,
-  Phone,
-  User,
-} from "lucide-react";
-import DeleteCheckout from "../../components/BooksPage/DeleteCheckout";
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
-import { TableCell, TableRow } from "../../components/ui/table";
-import useDeleteCheckout from "../../hooks/checkout/useDeleteCheckout";
-import useUpdateCheckout from "../../hooks/checkout/useUpdateCheckout";
+import { Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import type Checkout from "../../models/Checkout";
+import useUpdateCheckout from "../../hooks/checkout/useUpdateCheckout";
+import { Button } from "../ui/button";
+import { TableCell, TableRow } from "../ui/table";
+import DeleteCheckout from "../BooksPage/DeleteCheckout";
 
-const CheckoutRow = ({
+export default function CheckoutRow({
   checkout,
   daysRemaining,
 }: {
-  daysRemaining: number;
   checkout: Checkout;
-}) => {
-  const { mutate, isPending } = useDeleteCheckout();
-  const { mutate: renewCheckout, isPending: isPendingRenewal } =
-    useUpdateCheckout();
-
-  const getDaysRemainingColor = (daysRemaining: number) => {
-    if (daysRemaining <= 0) return "text-red-600 dark:text-red-400";
-    if (daysRemaining <= 3) return "text-orange-600 dark:text-orange-400";
-    if (daysRemaining <= 7) return "text-yellow-600 dark:text-yellow-400";
-    return "text-green-600 dark:text-green-400";
-  };
-
+  daysRemaining: number;
+}) {
+  const renewal = useUpdateCheckout();
   return (
-    <TableRow key={checkout.id}>
+    <TableRow>
       <TableCell>
-        <div className="flex items-center">
-          <User className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
-          <div className="min-w-0">
-            <div className="font-medium truncate">{checkout.user.name}</div>
-            <div className="text-sm flex items-center gap-2 text-gray-500 truncate ">
-              <Mail size={15} />
-              {checkout.user.email}
-            </div>
-            <div className="text-sm flex items-center gap-2 text-gray-500 truncate">
-              <Phone size={15} />
-              {checkout.user.phone}
-            </div>
-          </div>
-        </div>
+        <p className="font-bold">{checkout.user.name}</p>
+        <p className="text-muted-foreground mt-1 text-xs">
+          {checkout.user.email}
+        </p>
       </TableCell>
       <TableCell>
-        <div className="flex items-center">
-          <BookOpen className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
-          <div className="min-w-0">
-            <div className="font-medium truncate">{checkout.book.title}</div>
-            <div className="text-sm text-gray-500 truncate">
-              {checkout.book.author}
-            </div>
-          </div>
-        </div>
-      </TableCell>
-      <TableCell className="hidden sm:table-cell">
-        <div className="flex items-center">
-          <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-          {new Date(checkout.created_at).toLocaleDateString()}
-        </div>
+        <Link
+          className="hover:text-primary font-bold"
+          to={`/books/${checkout.book.id}`}
+        >
+          {checkout.book.title}
+        </Link>
+        <p className="text-muted-foreground mt-1 text-xs">
+          {checkout.book.author}
+        </p>
       </TableCell>
       <TableCell>
-        <div className="flex items-center">
-          <Clock className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
-          <div>
-            {(() => {
-              return (
-                <div
-                  className={`text-xs ${getDaysRemainingColor(daysRemaining)}`}
-                >
-                  {daysRemaining <= 0
-                    ? `${Math.abs(daysRemaining)} days overdue`
-                    : `${daysRemaining} days left`}
-                </div>
-              );
-            })()}
-          </div>
-        </div>
+        <p>
+          {new Date(checkout.return_date).toLocaleDateString(undefined, {
+            month: "short",
+            day: "numeric",
+          })}
+        </p>
+        <p className="text-muted-foreground mt-1 text-xs">
+          {daysRemaining < 0
+            ? `${Math.abs(daysRemaining)} days overdue`
+            : daysRemaining === 0
+              ? "Due today"
+              : `${daysRemaining} days left`}
+        </p>
       </TableCell>
       <TableCell>
-        <Badge variant={!(daysRemaining <= 0) ? "default" : "destructive"}>
-          {!(daysRemaining <= 0) ? "Active" : "Overdue"}
-        </Badge>
-      </TableCell>
-      <TableCell className="hidden lg:table-cell">
-        <span className="text-sm text-gray-600">
-          {checkout.renewal_number}/3
+        <span className={`status-label ${daysRemaining <= 0 ? "red" : ""}`}>
+          {daysRemaining < 0
+            ? "Overdue"
+            : daysRemaining === 0
+              ? "Due today"
+              : "On loan"}
         </span>
       </TableCell>
+      <TableCell className="hidden text-right tabular-nums lg:table-cell">
+        {checkout.renewal_number}/3
+      </TableCell>
       <TableCell>
-        <div className="flex items-center space-x-2">
-          {
-            <>
-              <Button
-                onClick={() => {
-                  mutate({ id: checkout.id });
-                }}
-                variant="outline"
-                disabled={isPending}
-                size="sm"
-                asChild
-              >
-                <DeleteCheckout isOnMenu checkout={checkout} />
-              </Button>
-              {checkout.renewal_number < 3 ? (
-                <Button
-                  onClick={() => {
-                    renewCheckout({ id: checkout.id });
-                  }}
-                  variant="ghost"
-                  size="sm"
-                  disabled={isPendingRenewal}
-                >
-                  {isPendingRenewal ? (
-                    <Loader2Icon className="animate-spin" />
-                  ) : (
-                    "Renew"
-                  )}
-                </Button>
-              ) : (
-                <span className="text-sm text-gray-500">Completed</span>
-              )}
-            </>
-          }
+        <div className="flex items-center justify-end gap-2">
+          <DeleteCheckout checkout={checkout} isOnMenu />
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={
+              renewal.isPending ||
+              checkout.renewal_number >= 3 ||
+              daysRemaining > 0
+            }
+            title={
+              daysRemaining > 0
+                ? "Renewal is available on the due date"
+                : checkout.renewal_number >= 3
+                  ? "This loan has reached its renewal limit"
+                  : "Renew for another week"
+            }
+            onClick={() => renewal.mutate({ id: checkout.id })}
+          >
+            {renewal.isPending ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              "Renew"
+            )}
+          </Button>
         </div>
       </TableCell>
     </TableRow>
   );
-};
-
-export default CheckoutRow;
+}

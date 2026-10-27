@@ -1,23 +1,25 @@
+import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { BrandMark } from "./brand-mark";
+import { Button } from "./ui/button";
 
-const NotFound = () => {
+export default function NotFound() {
   return (
-    <div className="font-[poppins]">
-      <div className="flex h-[80vh] flex-col items-center justify-center">
-        <h1 className="mb-4 text-4xl font-bold text-blue-600">404</h1>
-        <h1 className="mb-4 text-4xl font-bold dark:text-gray-100">Not Found</h1>
-        <p className="mb-6 text-lg dark:text-gray-400">
-          The page you are looking for does not exist.
+    <main className="account-help">
+      <div>
+        <BrandMark size={58} />
+        <h1>This page isn’t on the shelf.</h1>
+        <p>
+          The link may have moved, or the page may no longer be part of the
+          library. Let’s find your way back.
         </p>
-        <Link
-          to="/"
-          className="rounded bg-blue-700 px-6 py-2 text-white transition hover:bg-blue-900"
-        >
-          Go to Homepage
-        </Link>
+        <Button asChild>
+          <Link to="/">
+            <ArrowLeft size={16} />
+            Back to the library
+          </Link>
+        </Button>
       </div>
-    </div>
+    </main>
   );
-};
-
-export default NotFound;
+}

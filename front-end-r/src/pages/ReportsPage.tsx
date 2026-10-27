@@ -1,316 +1,218 @@
-"use client";
-
-import { useState } from "react";
-import {
-  TrendingUp,
-  Users,
-  BookOpen,
-  AlertCircle,
-  Download,
-} from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/select";
-import { Badge } from "../components/ui/badge";
+import { ArrowUpRight, Download, RefreshCw } from "lucide-react";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import { BookCover } from "../components/book-cover";
+import { EmptyState, LoadError } from "../components/empty-state";
 import { PageHeader } from "../components/page-header";
+import { Button } from "../components/ui/button";
+import { Skeleton } from "../components/ui/skeleton";
+import useAnalytics from "../hooks/useAnalytics";
 
-// Fake data for reports
-const monthlyCheckouts = [
-  { month: "Jan", checkouts: 45, returns: 42 },
-  { month: "Feb", checkouts: 52, returns: 48 },
-  { month: "Mar", checkouts: 38, returns: 41 },
-  { month: "Apr", checkouts: 61, returns: 58 },
-  { month: "May", checkouts: 55, returns: 52 },
-  { month: "Jun", checkouts: 67, returns: 61 },
-];
-
-const popularBooks = [
-  {
-    title: "The Purpose Driven Life",
-    author: "Rick Warren",
-    checkouts: 23,
-    category: "Christian Living",
-  },
-  {
-    title: "Jesus Calling",
-    author: "Sarah Young",
-    checkouts: 19,
-    category: "Devotional",
-  },
-  {
-    title: "Mere Christianity",
-    author: "C.S. Lewis",
-    checkouts: 16,
-    category: "Apologetics",
-  },
-  {
-    title: "The Case for Christ",
-    author: "Lee Strobel",
-    checkouts: 14,
-    category: "Apologetics",
-  },
-  {
-    title: "Crazy Love",
-    author: "Francis Chan",
-    checkouts: 12,
-    category: "Christian Living",
-  },
-];
+function csvCell(value: string | number) {
+  const text = String(value);
+  // Keep titles and author names as text when opened in spreadsheet software.
+  const safe = /^\s*[=+\-@]/.test(text) ? `'${text}` : text;
+  return `"${safe.replaceAll('"', '""')}"`;
+}
 
 export default function ReportsPage() {
-  const [timeRange, setTimeRange] = useState("6months");
+  const { data, isLoading, isError, isFetching, refetch, dataUpdatedAt } =
+    useAnalytics();
+  const books = data?.total_books ?? 0;
+  const loans = data?.total_checkouts ?? 0;
+  const available = Math.max(0, books - loans);
+  const popular = (data?.popular_books ?? []).filter((row) => row.book);
+  const metrics = [
+    { label: "Books in the collection", value: books, link: "/books" },
+    {
+      label: "Library members",
+      value: data?.total_members ?? 0,
+      link: "/members",
+    },
+    { label: "Books on loan", value: loans, link: "/checkouts" },
+    {
+      label: "Overdue books",
+      value: data?.overdue_books ?? 0,
+      link: "/checkouts?filter=overdue",
+    },
+  ];
 
-  const maxCheckouts = Math.max(...monthlyCheckouts.map((m) => m.checkouts));
+  function exportSummary() {
+    if (!data || isError) return;
+    const rows: (string | number)[][] = [
+      ["Berea library summary", new Date(dataUpdatedAt).toISOString()],
+      ["Measure", "Count"],
+      ...metrics.map(({ label, value }) => [label, value]),
+      ["Books available", available],
+      [],
+      ["Most returned books this month"],
+      ["Title", "Author", "Returns"],
+      ...popular.map(({ book, borrow_count }) => [
+        book.title,
+        book.author,
+        borrow_count,
+      ]),
+    ];
+    const blob = new Blob(
+      ["\uFEFF", rows.map((row) => row.map(csvCell).join(",")).join("\r\n")],
+      { type: "text/csv;charset=utf-8;" },
+    );
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `berea-library-summary-${new Date(dataUpdatedAt).toISOString().slice(0, 10)}.csv`;
+    anchor.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast.success("Library summary downloaded.");
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="page">
       <PageHeader
-        title="Reports & Analytics"
-        description="Insights and statistics for your berea-cms"
+        title="Library reports"
+        description="A clear picture of the collection, ready to share."
       >
-        <div className="flex items-center space-x-2">
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1month">1 Month</SelectItem>
-              <SelectItem value="3months">3 Months</SelectItem>
-              <SelectItem value="6months">6 Months</SelectItem>
-              <SelectItem value="1year">1 Year</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
-        </div>
+        <Button
+          onClick={exportSummary}
+          disabled={!data || isLoading || isError}
+        >
+          <Download size={16} />
+          Export summary
+        </Button>
       </PageHeader>
-
-      <div className="px-4 sm:px-6 lg:px-8">
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Checkouts
-              </CardTitle>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">318</div>
-              <p className="text-xs text-muted-foreground">
-                +12% from last period
+      <div className="page-content">
+        {isError ? (
+          <LoadError onRetry={() => void refetch()} />
+        ) : (
+          <>
+            <dl className="metric-strip">
+              {metrics.map(({ label, value, link }) => (
+                <div className="metric" key={label}>
+                  <dt>{label}</dt>
+                  <dd>
+                    {isLoading ? (
+                      <Skeleton className="h-9 w-12" />
+                    ) : (
+                      value.toLocaleString()
+                    )}
+                  </dd>
+                  <Link to={link}>
+                    View records
+                    <ArrowUpRight size={12} />
+                  </Link>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+              <p className="page-date">
+                {dataUpdatedAt
+                  ? `Snapshot updated ${new Date(dataUpdatedAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`
+                  : "Preparing your library summary…"}
               </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Active Members
-              </CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">89</div>
-              <p className="text-xs text-muted-foreground">
-                +5% from last period
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Return Rate</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">94.2%</div>
-              <p className="text-xs text-muted-foreground">
-                +2.1% from last period
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Overdue Books
-              </CardTitle>
-              <AlertCircle className="h-4 w-4 text-destructive" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-destructive">3</div>
-              <p className="text-xs text-muted-foreground">-4 from last week</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - 2/3 width */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Monthly Activity Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Monthly Activity</CardTitle>
-                <CardDescription>
-                  Book checkouts and returns over time
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {monthlyCheckouts.map((month) => (
-                    <div key={month.month} className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="font-medium">{month.month}</span>
-                        <span className="text-gray-500">
-                          {month.checkouts} checkouts, {month.returns} returns
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={isFetching}
+                onClick={() => void refetch()}
+              >
+                <RefreshCw
+                  size={14}
+                  className={isFetching ? "animate-spin" : ""}
+                />
+                Refresh summary
+              </Button>
+            </div>
+            <div className="dashboard-grid">
+              <section aria-labelledby="returned-books">
+                <div className="section-title">
+                  <div>
+                    <h2 id="returned-books">Reader favourites</h2>
+                    <p>Most returned books this month.</p>
+                  </div>
+                </div>
+                {isLoading ? (
+                  <div className="space-y-5">
+                    {[0, 1, 2].map((key) => (
+                      <Skeleton key={key} className="h-14 w-full" />
+                    ))}
+                  </div>
+                ) : popular.length ? (
+                  <div className="activity-list">
+                    {popular.map(({ book, borrow_count }) => (
+                      <div className="activity-row" key={book.id}>
+                        <BookCover book={book} small />
+                        <div>
+                          <p>
+                            <Link to={`/books/${book.id}`}>{book.title}</Link>
+                          </p>
+                          <small>{book.author}</small>
+                        </div>
+                        <span className="text-muted-foreground text-right text-sm tabular-nums">
+                          {Number(borrow_count).toLocaleString()}{" "}
+                          {Number(borrow_count) === 1 ? "return" : "returns"}
                         </span>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-16 text-xs text-gray-500">
-                            Checkouts
-                          </div>
-                          <div className="flex-1">
-                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-blue-500 rounded-full"
-                                style={{
-                                  width: `${
-                                    (month.checkouts / maxCheckouts) * 100
-                                  }%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                          <div className="w-8 text-xs text-right">
-                            {month.checkouts}
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-16 text-xs text-gray-500">
-                            Returns
-                          </div>
-                          <div className="flex-1">
-                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-green-500 rounded-full"
-                                style={{
-                                  width: `${
-                                    (month.returns / maxCheckouts) * 100
-                                  }%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                          <div className="w-8 text-xs text-right">
-                            {month.returns}
-                          </div>
-                        </div>
-                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    title="A new chapter for the shelves"
+                    description="Books returned this month will appear in this report."
+                  />
+                )}
+              </section>
+              <aside className="dashboard-aside">
+                <section>
+                  <div className="section-title">
+                    <div>
+                      <h2>On the shelves</h2>
+                      <p>The collection’s availability right now.</p>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Popular Books */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Most Popular Books</CardTitle>
-                <CardDescription>
-                  Books with the highest checkout frequency
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {popularBooks.map((book, index) => (
-                    <div
-                      key={book.title}
-                      className="flex items-center space-x-4"
-                    >
-                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-medium text-blue-600">
-                          {index + 1}
+                  </div>
+                  {isLoading ? (
+                    <Skeleton className="h-24 w-full" />
+                  ) : (
+                    <>
+                      <div
+                        className="shelf-track"
+                        role="img"
+                        aria-label={`${available} books available, ${loans} on loan`}
+                      >
+                        <span
+                          className="shelf-available"
+                          style={{
+                            width: `${books ? (available / books) * 100 : 0}%`,
+                          }}
+                        />
+                        <span
+                          className="shelf-loaned"
+                          style={{
+                            width: `${books ? (loans / books) * 100 : 0}%`,
+                          }}
+                        />
+                      </div>
+                      <div className="shelf-legend">
+                        <span>
+                          <i />
+                          {available.toLocaleString()} available
+                        </span>
+                        <span>
+                          <i />
+                          {loans.toLocaleString()} on loan
                         </span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium truncate">{book.title}</div>
-                        <div className="text-sm text-gray-500">
-                          by {book.author}
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="outline">{book.category}</Badge>
-                        <div className="text-sm font-medium">
-                          {book.checkouts} checkouts
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column - 1/3 width */}
-          <div className="space-y-8">
-            {/* Quick Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Stats</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">
-                      Average checkout duration
-                    </span>
-                    <span className="font-medium">18 days</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">
-                      Books added this month
-                    </span>
-                    <span className="font-medium">12</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">
-                      New members this month
-                    </span>
-                    <span className="font-medium">8</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">
-                      Most popular day
-                    </span>
-                    <span className="font-medium">Sunday</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">
-                      Collection utilization
-                    </span>
-                    <span className="font-medium">67%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                    </>
+                  )}
+                </section>
+                <p className="text-muted-foreground mt-8 text-sm leading-7">
+                  The export contains these current totals and this month’s
+                  recorded returns. Historical monthly trends are not available
+                  yet.
+                </p>
+              </aside>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

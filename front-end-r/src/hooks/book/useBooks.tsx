@@ -33,21 +33,17 @@ const useBooks = ({
     apiClient
       .get<FetchBooksResponse>(
         (() => {
-          const params = [
-            `per_page=12`,
-            `page=${page}`,
-            `title=${title ?? ""}`,
-          ];
-          if (category && category !== "all") {
-            params.push(`category=${category}`);
-          }
-          if (status && status !== "all") {
-            params.push(`status=${status}`);
-          }
-          return `/books?${params.join("&")}`;
-        })()
+          const params = new URLSearchParams({
+            per_page: "12",
+            page: String(page),
+            title: title ?? "",
+          });
+          if (category && category !== "all") params.set("category", category);
+          if (status && status !== "all") params.set("status", status);
+          return `/books?${params.toString()}`;
+        })(),
       )
-      .then((res) => {  
+      .then((res) => {
         return res.data;
       });
 

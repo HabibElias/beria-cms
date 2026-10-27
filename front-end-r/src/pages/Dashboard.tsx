@@ -1,290 +1,325 @@
 import {
-  AlertCircle,
-  BookOpen,
-  Calendar,
-  Loader2Icon,
-  Users,
+  ArrowDownLeft,
+  ArrowRight,
+  ArrowUpRight,
+  CalendarClock,
+  Plus,
+  RefreshCw,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { BookCover } from "../components/book-cover";
+import { EmptyState, LoadError } from "../components/empty-state";
 import { PageHeader } from "../components/page-header";
 import { CheckoutBookDialog } from "../components/sidebar";
-import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
+import { Skeleton } from "../components/ui/skeleton";
 import useAnalytics from "../hooks/useAnalytics";
-// import useCategories from "../hooks/useCategories";
+import { useAuth } from "../provider/AuthProvider";
+
+function timeAgo(value: string) {
+  const minutes = Math.max(
+    0,
+    Math.floor((Date.now() - new Date(value).getTime()) / 60_000),
+  );
+  if (!Number.isFinite(minutes)) return "";
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  if (minutes < 1440) return `${Math.floor(minutes / 60)} hr ago`;
+  const days = Math.floor(minutes / 1440);
+  return days === 1
+    ? "Yesterday"
+    : days < 7
+      ? `${days} days ago`
+      : new Date(value).toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+        });
+}
 
 export default function Dashboard() {
-  const { data: analytics, isLoading } = useAnalytics();
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center w-full h-screen">
-        <Loader2Icon className="animate-spin" />
-      </div>
-    );
-  }
-
-  function formatTimeAgo(created_at: string): import("react").ReactNode {
-    const date = new Date(created_at);
-    const now = new Date();
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (seconds < 60) return "just now";
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days} day${days > 1 ? "s" : ""} ago`;
-    const weeks = Math.floor(days / 7);
-    if (weeks < 4) return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
-    const months = Math.floor(days / 30);
-    if (months < 12) return `${months} month${months > 1 ? "s" : ""} ago`;
-    const years = Math.floor(days / 365);
-    return `${years} year${years > 1 ? "s" : ""} ago`;
-  }
-
+  const { data, isLoading, isError, isFetching, refetch } = useAnalytics();
+  const { user } = useAuth();
+  const books = data?.total_books ?? 0;
+  const loans = data?.total_checkouts ?? 0;
+  const available = Math.max(0, books - loans);
+  const popular = (data?.popular_books ?? [])
+    .filter((row) => row.book)
+    .slice(0, 5);
+  const maxBorrows = Math.max(1, ...popular.map((row) => row.borrow_count));
+  const metrics = [
+    {
+      label: "Books in the collection",
+      value: books,
+      link: "/books",
+      action: "Explore the shelves",
+    },
+    {
+      label: "Library members",
+      value: data?.total_members ?? 0,
+      link: "/members",
+      action: "Meet your readers",
+    },
+    {
+      label: "Books on loan",
+      value: loans,
+      link: "/checkouts",
+      action: "See current checkouts",
+    },
+    {
+      label: "Overdue books",
+      value: data?.overdue_books ?? 0,
+      link: "/checkouts?filter=overdue",
+      action: "Review returns",
+    },
+  ];
   return (
-    <div className="space-y-6">
+    <div className="page">
       <PageHeader
-        title="Dashboard"
-        description="Overview of your church library system"
-      />
-
-      <div className="px-4 sm:px-6 lg:px-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Books</CardTitle>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analytics?.total_books}</div>
-              <p className="text-xs text-muted-foreground">total books</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Active Members
-              </CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {analytics?.total_members}
-              </div>
-              <p className="text-xs text-muted-foreground">total members</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Books Checked Out
-              </CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {analytics?.total_checkouts}
-              </div>
-              <p className="text-xs text-muted-foreground">total checkouts</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Overdue Books
-              </CardTitle>
-              <AlertCircle className="h-4 w-4 text-destructive" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-destructive">
-                {analytics?.overdue_books}
-              </div>
-              <p className="text-xs text-muted-foreground">needs attention</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {/* Recent Activity - Takes 2 columns on large screens */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>
-                  Latest book check-outs and returns
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {analytics?.recent_activities && analytics.recent_activities.length > 0 ? (
-                    analytics.recent_activities.map((act, index) => (
-                      <div className="flex items-center" key={index}>
-                        <div
-                          className={`w-2 h-2 rounded-full mr-3 ${
-                            act.type === "checkout" ? "bg-blue-500" : "bg-green-500"
-                          }`}
-                        ></div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
-                            "{act.book.title}" {act.type === "checkout" ? "checked out" : "returned"}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {act.user.name} &middot; {formatTimeAgo(act.created_at)}
-                          </p>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
-                      <Calendar className="h-8 w-8 mb-2 opacity-40" />
-                      <p className="text-sm font-semibold">No recent activity</p>
-                      <p className="text-xs">Check out or return a book to see activity here.</p>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-6">
-                  <Button
-                    variant="outline"
-                    className="w-full bg-transparent"
-                    asChild
-                  >
-                    <Link to="/checkouts">View All Activity</Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar Content */}
-          <div className="space-y-6">
-            {/* Popular Books */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Popular Books</CardTitle>
-                <CardDescription>Most borrowed this month</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {analytics?.popular_books.map(
-                    ({ book, borrow_count }, index) => (
-                      <div
-                        className="flex items-center justify-between"
-                        key={index}
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium truncate">
-                            {book.title}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {book.author}
-                          </p>
-                        </div>
-                        <Badge variant="secondary">{borrow_count}</Badge>
-                      </div>
-                    )
-                  )}
-                    {(!analytics?.popular_books || analytics.popular_books.length === 0) && (
-                    <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
-                      <BookOpen className="h-8 w-8 mb-2 opacity-40" />
-                      <p className="text-sm font-semibold">No popular books yet</p>
-                      <p className="text-xs">Add books and check them out to see stats here.</p>
-                    </div>
+        title="Library overview"
+        description={`Good to see you${user?.name ? `, ${user.name.split(" ")[0]}` : ""}. Here’s how the library is doing.`}
+      >
+        <CheckoutBookDialog />
+      </PageHeader>
+      <div className="page-content">
+        {isError ? (
+          <LoadError onRetry={() => void refetch()} />
+        ) : (
+          <>
+            <dl className="metric-strip">
+              {metrics.map((metric) => (
+                <div className="metric" key={metric.label}>
+                  <dt>{metric.label}</dt>
+                  <dd>
+                    {isLoading ? (
+                      <Skeleton className="h-9 w-12" />
+                    ) : (
+                      metric.value.toLocaleString()
                     )}
+                  </dd>
+                  <Link to={metric.link}>
+                    {metric.action}
+                    <ArrowUpRight size={12} />
+                  </Link>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Overdue Alert */}
-            <Card className="border-destructive/50 dark:border-destructive">
-              <CardHeader>
-                <CardTitle className="text-destructive flex items-center">
-                  <AlertCircle className="h-4 w-4 mr-2" />
-                  Overdue Alert
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="text-sm">
-                    <p className="font-medium">
-                      {analytics?.overdue_books ?? 0}{" "}
-                      {(analytics?.overdue_books ?? 0) > 1 ? "books" : "book"}{" "}
-                      overdue
+              ))}
+            </dl>
+            <div className="mt-5 flex items-center justify-between gap-3">
+              <p className="page-date">
+                {new Date().toLocaleDateString("en", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void refetch()}
+                disabled={isFetching}
+                aria-label="Refresh library overview"
+              >
+                <RefreshCw
+                  size={14}
+                  className={isFetching ? "animate-spin" : ""}
+                />
+                Refresh
+              </Button>
+            </div>
+            {!isLoading && (data?.overdue_books ?? 0) > 0 && (
+              <div className="attention-note mt-4">
+                <CalendarClock size={18} />
+                <p>
+                  {data!.overdue_books}{" "}
+                  {data!.overdue_books === 1 ? "book is" : "books are"} ready
+                  for a return reminder.
+                </p>
+                <Link to="/checkouts?filter=overdue">
+                  Review overdue
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            )}
+            <div className="dashboard-grid">
+              <section aria-labelledby="recent-activity">
+                <div className="section-title">
+                  <div>
+                    <h2 id="recent-activity">Around the library</h2>
+                    <p>Recent checkouts and books welcomed home.</p>
+                  </div>
+                  <Link to="/checkouts">
+                    View all
+                    <ArrowRight size={14} />
+                  </Link>
+                </div>
+                {isLoading ? (
+                  <div className="space-y-6">
+                    {Array.from({ length: 4 }, (_, i) => (
+                      <Skeleton className="h-12 w-full" key={i} />
+                    ))}
+                  </div>
+                ) : data?.recent_activities?.length ? (
+                  <div className="activity-list">
+                    {data.recent_activities.map((activity, index) => (
+                      <div
+                        className="activity-row"
+                        key={`${activity.type}-${activity.id}-${index}`}
+                      >
+                        <span className="activity-symbol">
+                          {activity.type === "return" ? (
+                            <ArrowDownLeft size={20} strokeWidth={1.5} />
+                          ) : (
+                            <ArrowUpRight size={20} strokeWidth={1.5} />
+                          )}
+                        </span>
+                        <div>
+                          <p>
+                            {activity.book ? (
+                              <Link to={`/books/${activity.book.id}`}>
+                                {activity.book.title}
+                              </Link>
+                            ) : (
+                              "Book no longer in the collection"
+                            )}
+                          </p>
+                          <small>
+                            {activity.user?.name ?? "Former library member"} ·{" "}
+                            {timeAgo(activity.created_at)}
+                          </small>
+                        </div>
+                        <span
+                          className={`status-label ${activity.type === "checkout" ? "gold" : ""}`}
+                        >
+                          {activity.type === "return"
+                            ? "Returned"
+                            : "Checked out"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    title="Every story starts somewhere"
+                    description="The next checkout or return will appear here."
+                  >
+                    <CheckoutBookDialog
+                      childButton={
+                        <Button variant="outline" size="sm">
+                          <Plus size={14} />
+                          Record a checkout
+                        </Button>
+                      }
+                    />
+                  </EmptyState>
+                )}
+              </section>
+              <aside className="dashboard-aside">
+                <section>
+                  <div className="section-title">
+                    <div>
+                      <h2>Reader favourites</h2>
+                      <p>Most returned books this month.</p>
+                    </div>
+                  </div>
+                  {isLoading ? (
+                    <div className="space-y-4">
+                      {Array.from({ length: 3 }, (_, i) => (
+                        <Skeleton className="h-12 w-full" key={i} />
+                      ))}
+                    </div>
+                  ) : popular.length ? (
+                    <div className="popular-list">
+                      {popular.map(({ book, borrow_count }) => (
+                        <Link
+                          className="popular-book"
+                          to={`/books/${book.id}`}
+                          key={book.id}
+                        >
+                          <BookCover book={book} small />
+                          <div>
+                            <strong>{book.title}</strong>
+                            <small>{book.author}</small>
+                            <div className="popular-bar">
+                              <span
+                                style={{
+                                  width: `${(borrow_count / maxBorrows) * 100}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <span title={`${borrow_count} returns this month`}>
+                            {borrow_count}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground text-sm leading-7">
+                      As books are borrowed and returned, your community’s
+                      favourites will find their place here.
                     </p>
-                    <p className="text-muted-foreground">
-                      members need to be contacted
-                    </p>
+                  )}
+                </section>
+                <section className="shelf-summary">
+                  <h2>Room for another reader</h2>
+                  <p>
+                    {isLoading
+                      ? "Checking the shelves…"
+                      : books
+                        ? `${available.toLocaleString()} ${available === 1 ? "book is" : "books are"} available to borrow.`
+                        : "Your collection is ready for its first book."}
+                  </p>
+                  <div
+                    className="shelf-track"
+                    role="img"
+                    aria-label={
+                      books
+                        ? `${available} available books and ${loans} books on loan`
+                        : "No books in the collection"
+                    }
+                  >
+                    <span
+                      className="shelf-available"
+                      style={{
+                        width: `${books ? (available / books) * 100 : 0}%`,
+                      }}
+                    />
+                    <span
+                      className="shelf-loaned"
+                      style={{ width: `${books ? (loans / books) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <div className="shelf-legend">
+                    <span>
+                      <i />
+                      On the shelves
+                    </span>
+                    <span>
+                      <i />
+                      With a reader
+                    </span>
                   </div>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full bg-transparent"
                     asChild
+                    variant="link"
+                    className="mt-3 h-auto p-0 text-xs"
                   >
-                    <Link to="/checkouts?filter=overdue">
-                      View Overdue Books
+                    <Link
+                      to={
+                        books || user?.role !== "admin"
+                          ? "/books"
+                          : "/books/add"
+                      }
+                    >
+                      {books ? "Find the next read" : "Build the collection"}
+                      <ArrowRight size={14} />
                     </Link>
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Common tasks and shortcuts</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                <Button asChild className="h-20 flex-col">
-                  <Link to="/books/add">
-                    <BookOpen className="h-6 w-6 mb-2" />
-                    Add Book
-                  </Link>
-                </Button>
-                <CheckoutBookDialog
-                  childButton={
-                    <Button
-                      variant="outline"
-                      className="h-20 flex-col bg-transparent"
-                    >
-                      <Calendar className="h-6 w-6 mb-2" />
-                      Check Out
-                    </Button>
-                  }
-                />
-                <Button
-                  asChild
-                  variant="outline"
-                  className="h-20 flex-col bg-transparent"
-                >
-                  <Link to="/members/add">
-                    <Users className="h-6 w-6 mb-2" />
-                    Add Member
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                </section>
+              </aside>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 import NotFound from "../../components/not-found";
+import { BookCover } from "../../components/book-cover";
 import { PageHeader } from "../../components/page-header";
 import { Button } from "../../components/ui/button";
 import {
@@ -25,7 +26,7 @@ import {
 } from "../../components/ui/select";
 import { Skeleton } from "../../components/ui/skeleton";
 import { Textarea } from "../../components/ui/textarea";
-import { supabase } from "../../config/supabase";
+import { uploadBookImage } from "../../services/bookImages";
 import useBook from "../../hooks/book/useBook";
 import useUpdateBook from "../../hooks/book/useUpdateBook";
 import useCategories from "../../hooks/category/useCategories";
@@ -51,13 +52,12 @@ export default function UpdateBookPage() {
 
   const navigate = useNavigate();
 
-  
   // getting the book from the db
-  const { data: book, isLoading } = useBook(id??"");
+  const { data: book, isLoading } = useBook(id ?? "");
 
   const condition = watch("condition") ?? book?.condition;
   const category_id =
-  watch("category_id") ??
+    watch("category_id") ??
     (book?.category?.id ? String(book.category.id) : "");
   const [bookImg, setBookImg] = useState<string | null>(null);
   const [isPending, setIsPending] = useState<boolean>(false);
@@ -88,31 +88,16 @@ export default function UpdateBookPage() {
     if (isPending || storeIsPending) return; // Prevent double submit
     if (bookImgFile) {
       setIsPending(true);
-      const storage = supabase.storage.from(
-        import.meta.env.VITE_SUPABASE_BUCKET,
-      );
-      // delete the previous img
-      await storage.remove([book?.book_path ?? ""]);
-
-      const filePath = `books/${Date.now()}_${bookImgFile.name}`;
-      const { data: supabaseData, error } = await storage.upload(
-        filePath,
-        bookImgFile,
-      );
-      if (error) {
-        toast.error("Failed to upload image.");
-        setIsPending(false);
+      try {
+        const image = await uploadBookImage(bookImgFile);
+        data.book_img = image.book_img;
+        data.book_path = image.book_path;
+      } catch {
+        toast.error("Failed to upload image. Please try again.");
         return;
-      }
-      const { data: imgUrlData } = storage.getPublicUrl(supabaseData.path);
-      if (!imgUrlData) {
-        toast.error("Failed to get image.");
+      } finally {
         setIsPending(false);
-        return;
       }
-      data.book_img = imgUrlData?.publicUrl;
-      data.book_path = supabaseData?.path;
-      setIsPending(false);
     }
     mutate(
       { id: book?.id?.toString() ?? "", data: data },
@@ -159,11 +144,12 @@ export default function UpdateBookPage() {
         <Loader2Icon className="animate-spin" />
       </div>
     );
+  if (!book) return <NotFound />;
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Update a Book"
-        description="update a book from berea-cms collection"
+        title="Update a book"
+        description="Keep the details ready for the next reader."
       >
         <Button variant="outline" asChild>
           <Link to="/books">
@@ -185,35 +171,27 @@ export default function UpdateBookPage() {
                   <Label htmlFor="book-img">Book Image</Label>
                   <Input
                     type="file"
-                    accept="image/*,application/pdf"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     onChange={handleFileChange}
                     name="book-img"
                     id="book-img"
                   />
-                  {bookImg ? (
-                    <div className="mt-2">
-                      <span className="text-gray-500">Image Preview:</span>
-                      <img
-                        src={bookImg}
-                        alt="book-img Preview"
-                        className="mt-2 max-h-40 rounded-md border"
-                      />
-                    </div>
-                  ) : (
-                    <div className="mt-2">
-                      <span className="text-gray-500">Image Preview:</span>
-                      <img
-                        src={book?.book_img ?? "/placeholder.svg"}
-                        alt="book-img Preview"
-                        className="mt-2 max-h-40 rounded-md border"
-                      />
-                    </div>
-                  )}
+                  <div className="mt-4 flex items-center gap-4">
+                    <BookCover
+                      key={bookImg || book.book_img || "no-cover"}
+                      book={{ ...book, book_img: bookImg || book.book_img }}
+                    />
+                    <p className="text-muted-foreground max-w-56 text-sm">
+                      {bookImg
+                        ? "New cover preview. Save the book to upload it."
+                        : "Choose a cover image, or keep the title-led jacket."}
+                    </p>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="title">
-                      Title <span className="text-red-400">*</span>
+                      Title <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="title"
@@ -221,14 +199,14 @@ export default function UpdateBookPage() {
                       {...register("title")}
                     />
                     {errors.title && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="text-destructive mt-2 text-xs">
                         <p>{errors.title.message}</p>
                       </div>
                     )}
                   </div>
                   <div>
                     <Label htmlFor="author">
-                      Author <span className="text-red-400">*</span>
+                      Author <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="author"
@@ -236,7 +214,7 @@ export default function UpdateBookPage() {
                       {...register("author")}
                     />
                     {errors.author && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="text-destructive mt-2 text-xs">
                         <p>{errors.author.message}</p>
                       </div>
                     )}
@@ -252,14 +230,15 @@ export default function UpdateBookPage() {
                       {...register("publisher")}
                     />
                     {errors.publisher && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="text-destructive mt-2 text-xs">
                         <p>{errors.publisher.message}</p>
                       </div>
                     )}
                   </div>
                   <div>
                     <Label htmlFor="publication-year">
-                      Publication Year <span className="text-red-400">*</span>
+                      Publication Year{" "}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="publication-year"
@@ -268,14 +247,14 @@ export default function UpdateBookPage() {
                       {...register("published_year")}
                     />
                     {errors.published_year && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="text-destructive mt-2 text-xs">
                         <p>{errors.published_year.message}</p>
                       </div>
                     )}
                   </div>
                   <div>
                     <Label htmlFor="pages">
-                      Pages <span className="text-red-400">*</span>
+                      Pages <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="pages"
@@ -284,7 +263,7 @@ export default function UpdateBookPage() {
                       {...register("pages")}
                     />
                     {errors.pages && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="text-destructive mt-2 text-xs">
                         <p>{errors.pages.message}</p>
                       </div>
                     )}
@@ -294,7 +273,7 @@ export default function UpdateBookPage() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="location">
-                      Shelf Location <span className="text-red-400">*</span>
+                      Shelf Location <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="location"
@@ -302,14 +281,14 @@ export default function UpdateBookPage() {
                       {...register("location")}
                     />
                     {errors.location && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="text-destructive mt-2 text-xs">
                         <p>{errors.location.message}</p>
                       </div>
                     )}
                   </div>
                   <div>
                     <Label htmlFor="condition">
-                      Condition <span className="text-red-400">*</span>
+                      Condition <span className="text-destructive">*</span>
                     </Label>
                     <Select
                       value={condition}
@@ -333,14 +312,14 @@ export default function UpdateBookPage() {
                       </SelectContent>
                     </Select>
                     {errors.condition && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="text-destructive mt-2 text-xs">
                         <p>{errors.condition.message}</p>
                       </div>
                     )}
                   </div>
                   <div>
                     <Label htmlFor="category">
-                      Category <span className="text-red-400">*</span>
+                      Category <span className="text-destructive">*</span>
                     </Label>
                     {!catIsLoading ? (
                       categories?.length == 0 ? (
@@ -371,7 +350,7 @@ export default function UpdateBookPage() {
                       <Skeleton className="h-10 w-1/2 rounded-md" />
                     )}
                     {errors.category_id && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="text-destructive mt-2 text-xs">
                         <p>{errors.category_id.message}</p>
                       </div>
                     )}
@@ -380,16 +359,16 @@ export default function UpdateBookPage() {
 
                 <div>
                   <Label htmlFor="description">
-                    Description <span className="text-red-400">*</span>
+                    Description <span className="text-destructive">*</span>
                   </Label>
                   <Textarea
                     id="description"
-                    placeholder="Brief description of the book (optional)"
+                    placeholder="A few words to help the next reader."
                     rows={3}
                     {...register("description")}
                   />
                   {errors.description && (
-                    <div className="mt-2 text-xs text-red-400">
+                    <div className="text-destructive mt-2 text-xs">
                       <p>{errors.description.message}</p>
                     </div>
                   )}
@@ -404,13 +383,13 @@ export default function UpdateBookPage() {
                     {...register("notes")}
                   />
                   {errors.notes && (
-                    <div className="mt-2 text-xs text-red-400">
+                    <div className="text-destructive mt-2 text-xs">
                       <p>{errors.notes.message}</p>
                     </div>
                   )}
                 </div>
 
-                <div className="flex flex-col-reverse space-y-4 space-y-reverse sm:flex-row sm:justify-end sm:space-x-4 sm:space-y-0">
+                <div className="flex flex-col-reverse space-y-4 space-y-reverse sm:flex-row sm:justify-end sm:space-y-0 sm:space-x-4">
                   <Button variant="outline" asChild>
                     <Link to="/books">Cancel</Link>
                   </Button>

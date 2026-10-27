@@ -32,12 +32,11 @@ const DeleteBook = ({ book, isOnMenu }: { isOnMenu?: boolean; book: Book }) => {
           {isOnMenu && "delete"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="font-[poppins]">
+      <DialogContent className="font-sans">
         <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogTitle>Delete “{book.title}”?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your book
-            data from our servers.
+            This permanently removes this book from the collection. This cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -62,7 +61,7 @@ const DeleteBook = ({ book, isOnMenu }: { isOnMenu?: boolean; book: Book }) => {
               );
             }}
           >
-            {isPending ? <Loader2Icon className="animate-spin" /> : "Continue"}
+            {isPending ? <Loader2Icon className="animate-spin" /> : "Delete book"}
           </Button>
         </DialogFooter>
       </DialogContent>

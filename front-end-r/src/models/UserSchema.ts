@@ -12,7 +12,8 @@ export const UserPasswordSchema = z
       .min(6, { message: "Current password is required" }),
     new_password: z
       .string()
-      .min(6, { message: "New password must be at least 6 characters" }),
+      .min(12, { message: "New password must be at least 12 characters" })
+      .max(72, { message: "New password must be at most 72 characters" }),
     new_password_confirmation: z.string(),
   })
   .refine((data) => data.new_password === data.new_password_confirmation, {

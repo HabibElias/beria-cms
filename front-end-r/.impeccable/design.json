@@ -1,0 +1,670 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-27T13:28:31Z",
+  "title": "Design System: Berea library",
+  "extensions": {
+    "colorMeta": {
+      "covenant-blue": {
+        "role": "primary",
+        "displayName": "Covenant Blue",
+        "tonalRamp": [
+          "oklch(15% 0.0421 257.17)",
+          "oklch(26% 0.0730 257.17)",
+          "oklch(37% 0.1039 257.17)",
+          "oklch(49% 0.1375 257.17)",
+          "oklch(61% 0.1095 257.17)",
+          "oklch(73% 0.0758 257.17)",
+          "oklch(85% 0.0421 257.17)",
+          "oklch(95% 0.0140 257.17)"
+        ]
+      },
+      "midnight": {
+        "role": "primary",
+        "displayName": "Midnight",
+        "tonalRamp": [
+          "oklch(15% 0.0248 256.49)",
+          "oklch(26% 0.0431 256.49)",
+          "oklch(37% 0.0613 256.49)",
+          "oklch(49% 0.0812 256.49)",
+          "oklch(61% 0.0646 256.49)",
+          "oklch(73% 0.0447 256.49)",
+          "oklch(85% 0.0248 256.49)",
+          "oklch(95% 0.0083 256.49)"
+        ]
+      },
+      "radiant-gold": {
+        "role": "secondary",
+        "displayName": "Radiant Gold",
+        "tonalRamp": [
+          "oklch(15% 0.0473 81.35)",
+          "oklch(26% 0.0819 81.35)",
+          "oklch(37% 0.1166 81.35)",
+          "oklch(49% 0.1544 81.35)",
+          "oklch(61% 0.1229 81.35)",
+          "oklch(73% 0.0851 81.35)",
+          "oklch(85% 0.0473 81.35)",
+          "oklch(95% 0.0158 81.35)"
+        ]
+      },
+      "soft-gold": {
+        "role": "secondary",
+        "displayName": "Soft Gold",
+        "tonalRamp": [
+          "oklch(15% 0.0367 79.47)",
+          "oklch(26% 0.0636 79.47)",
+          "oklch(37% 0.0904 79.47)",
+          "oklch(49% 0.1198 79.47)",
+          "oklch(61% 0.0953 79.47)",
+          "oklch(73% 0.0660 79.47)",
+          "oklch(85% 0.0367 79.47)",
+          "oklch(95% 0.0122 79.47)"
+        ]
+      },
+      "parchment": {
+        "role": "neutral",
+        "displayName": "Parchment",
+        "tonalRamp": [
+          "oklch(15% 0.0071 99.10)",
+          "oklch(26% 0.0124 99.10)",
+          "oklch(37% 0.0176 99.10)",
+          "oklch(49% 0.0233 99.10)",
+          "oklch(61% 0.0186 99.10)",
+          "oklch(73% 0.0128 99.10)",
+          "oklch(85% 0.0071 99.10)",
+          "oklch(95% 0.0024 99.10)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "tonalRamp": [
+          "oklch(15% 0.0000 0.00)",
+          "oklch(26% 0.0000 0.00)",
+          "oklch(37% 0.0000 0.00)",
+          "oklch(49% 0.0000 0.00)",
+          "oklch(61% 0.0000 0.00)",
+          "oklch(73% 0.0000 0.00)",
+          "oklch(85% 0.0000 0.00)",
+          "oklch(95% 0.0000 0.00)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0189 254.25)",
+          "oklch(26% 0.0328 254.25)",
+          "oklch(37% 0.0467 254.25)",
+          "oklch(49% 0.0618 254.25)",
+          "oklch(61% 0.0492 254.25)",
+          "oklch(73% 0.0341 254.25)",
+          "oklch(85% 0.0189 254.25)",
+          "oklch(95% 0.0063 254.25)"
+        ]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Warm Secondary",
+        "tonalRamp": [
+          "oklch(15% 0.0090 92.32)",
+          "oklch(26% 0.0156 92.32)",
+          "oklch(37% 0.0222 92.32)",
+          "oklch(49% 0.0294 92.32)",
+          "oklch(61% 0.0234 92.32)",
+          "oklch(73% 0.0162 92.32)",
+          "oklch(85% 0.0090 92.32)",
+          "oklch(95% 0.0030 92.32)"
+        ]
+      },
+      "secondary-ink": {
+        "role": "neutral",
+        "displayName": "Secondary Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0251 252.85)",
+          "oklch(26% 0.0435 252.85)",
+          "oklch(37% 0.0619 252.85)",
+          "oklch(49% 0.0819 252.85)",
+          "oklch(61% 0.0652 252.85)",
+          "oklch(73% 0.0452 252.85)",
+          "oklch(85% 0.0251 252.85)",
+          "oklch(95% 0.0084 252.85)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0028 106.57)",
+          "oklch(26% 0.0048 106.57)",
+          "oklch(37% 0.0068 106.57)",
+          "oklch(49% 0.0091 106.57)",
+          "oklch(61% 0.0072 106.57)",
+          "oklch(73% 0.0050 106.57)",
+          "oklch(85% 0.0028 106.57)",
+          "oklch(95% 0.0009 106.57)"
+        ]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0094 250.13)",
+          "oklch(26% 0.0163 250.13)",
+          "oklch(37% 0.0232 250.13)",
+          "oklch(49% 0.0307 250.13)",
+          "oklch(61% 0.0245 250.13)",
+          "oklch(73% 0.0169 250.13)",
+          "oklch(85% 0.0094 250.13)",
+          "oklch(95% 0.0031 250.13)"
+        ]
+      },
+      "blue-tint": {
+        "role": "neutral",
+        "displayName": "Blue Tint",
+        "tonalRamp": [
+          "oklch(15% 0.0034 252.09)",
+          "oklch(26% 0.0059 252.09)",
+          "oklch(37% 0.0084 252.09)",
+          "oklch(49% 0.0112 252.09)",
+          "oklch(61% 0.0089 252.09)",
+          "oklch(73% 0.0061 252.09)",
+          "oklch(85% 0.0034 252.09)",
+          "oklch(95% 0.0011 252.09)"
+        ]
+      },
+      "destructive": {
+        "role": "secondary",
+        "displayName": "Destructive Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0569 25.84)",
+          "oklch(26% 0.0987 25.84)",
+          "oklch(37% 0.1405 25.84)",
+          "oklch(49% 0.1860 25.84)",
+          "oklch(61% 0.1481 25.84)",
+          "oklch(73% 0.1025 25.84)",
+          "oklch(85% 0.0569 25.84)",
+          "oklch(95% 0.0190 25.84)"
+        ]
+      },
+      "cross-red": {
+        "role": "secondary",
+        "displayName": "Cross Red",
+        "tonalRamp": [
+          "oklch(15% 0.0641 27.78)",
+          "oklch(26% 0.1111 27.78)",
+          "oklch(37% 0.1581 27.78)",
+          "oklch(49% 0.2093 27.78)",
+          "oklch(61% 0.1666 27.78)",
+          "oklch(73% 0.1154 27.78)",
+          "oklch(85% 0.0641 27.78)",
+          "oklch(95% 0.0214 27.78)"
+        ]
+      },
+      "red-tint": {
+        "role": "neutral",
+        "displayName": "Red Tint",
+        "tonalRamp": [
+          "oklch(15% 0.0049 22.08)",
+          "oklch(26% 0.0085 22.08)",
+          "oklch(37% 0.0121 22.08)",
+          "oklch(49% 0.0160 22.08)",
+          "oklch(61% 0.0127 22.08)",
+          "oklch(73% 0.0088 22.08)",
+          "oklch(85% 0.0049 22.08)",
+          "oklch(95% 0.0016 22.08)"
+        ]
+      },
+      "gold-tint": {
+        "role": "neutral",
+        "displayName": "Gold Tint",
+        "tonalRamp": [
+          "oklch(15% 0.0115 89.09)",
+          "oklch(26% 0.0200 89.09)",
+          "oklch(37% 0.0284 89.09)",
+          "oklch(49% 0.0377 89.09)",
+          "oklch(61% 0.0300 89.09)",
+          "oklch(73% 0.0208 89.09)",
+          "oklch(85% 0.0115 89.09)",
+          "oklch(95% 0.0038 89.09)"
+        ]
+      },
+      "gold-ink": {
+        "role": "neutral",
+        "displayName": "Gold Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0277 78.69)",
+          "oklch(26% 0.0479 78.69)",
+          "oklch(37% 0.0682 78.69)",
+          "oklch(49% 0.0903 78.69)",
+          "oklch(61% 0.0719 78.69)",
+          "oklch(73% 0.0498 78.69)",
+          "oklch(85% 0.0277 78.69)",
+          "oklch(95% 0.0092 78.69)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Surface Border",
+        "tonalRamp": [
+          "oklch(15% 0.0014 134.85)",
+          "oklch(26% 0.0024 134.85)",
+          "oklch(37% 0.0034 134.85)",
+          "oklch(49% 0.0044 134.85)",
+          "oklch(61% 0.0035 134.85)",
+          "oklch(73% 0.0024 134.85)",
+          "oklch(85% 0.0014 134.85)",
+          "oklch(95% 0.0005 134.85)"
+        ]
+      },
+      "input": {
+        "role": "neutral",
+        "displayName": "Input Border",
+        "tonalRamp": [
+          "oklch(15% 0.0041 240.98)",
+          "oklch(26% 0.0072 240.98)",
+          "oklch(37% 0.0102 240.98)",
+          "oklch(49% 0.0135 240.98)",
+          "oklch(61% 0.0108 240.98)",
+          "oklch(73% 0.0075 240.98)",
+          "oklch(85% 0.0041 240.98)",
+          "oklch(95% 0.0014 240.98)"
+        ]
+      },
+      "nav-accent": {
+        "role": "neutral",
+        "displayName": "Navigation Accent",
+        "tonalRamp": [
+          "oklch(15% 0.0031 247.94)",
+          "oklch(26% 0.0054 247.94)",
+          "oklch(37% 0.0076 247.94)",
+          "oklch(49% 0.0101 247.94)",
+          "oklch(61% 0.0081 247.94)",
+          "oklch(73% 0.0056 247.94)",
+          "oklch(85% 0.0031 247.94)",
+          "oklch(95% 0.0010 247.94)"
+        ]
+      },
+      "nav-border": {
+        "role": "neutral",
+        "displayName": "Navigation Border",
+        "tonalRamp": [
+          "oklch(15% 0.0058 93.68)",
+          "oklch(26% 0.0100 93.68)",
+          "oklch(37% 0.0142 93.68)",
+          "oklch(49% 0.0188 93.68)",
+          "oklch(61% 0.0150 93.68)",
+          "oklch(73% 0.0104 93.68)",
+          "oklch(85% 0.0058 93.68)",
+          "oklch(95% 0.0019 93.68)"
+        ]
+      },
+      "chart-blue": {
+        "role": "neutral",
+        "displayName": "Chart Blue",
+        "tonalRamp": [
+          "oklch(15% 0.0210 253.57)",
+          "oklch(26% 0.0364 253.57)",
+          "oklch(37% 0.0518 253.57)",
+          "oklch(49% 0.0686 253.57)",
+          "oklch(61% 0.0546 253.57)",
+          "oklch(73% 0.0378 253.57)",
+          "oklch(85% 0.0210 253.57)",
+          "oklch(95% 0.0070 253.57)"
+        ]
+      },
+      "dark-paper": {
+        "role": "neutral",
+        "displayName": "Dark Paper",
+        "tonalRamp": [
+          "oklch(15% 0.0232 256.36)",
+          "oklch(26% 0.0402 256.36)",
+          "oklch(37% 0.0572 256.36)",
+          "oklch(49% 0.0758 256.36)",
+          "oklch(61% 0.0603 256.36)",
+          "oklch(73% 0.0418 256.36)",
+          "oklch(85% 0.0232 256.36)",
+          "oklch(95% 0.0077 256.36)"
+        ]
+      },
+      "dark-secondary": {
+        "role": "neutral",
+        "displayName": "Dark Secondary",
+        "tonalRamp": [
+          "oklch(15% 0.0145 245.21)",
+          "oklch(26% 0.0252 245.21)",
+          "oklch(37% 0.0358 245.21)",
+          "oklch(49% 0.0474 245.21)",
+          "oklch(61% 0.0377 245.21)",
+          "oklch(73% 0.0261 245.21)",
+          "oklch(85% 0.0145 245.21)",
+          "oklch(95% 0.0048 245.21)"
+        ]
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "Dark Muted",
+        "tonalRamp": [
+          "oklch(15% 0.0177 250.22)",
+          "oklch(26% 0.0306 250.22)",
+          "oklch(37% 0.0436 250.22)",
+          "oklch(49% 0.0577 250.22)",
+          "oklch(61% 0.0460 250.22)",
+          "oklch(73% 0.0318 250.22)",
+          "oklch(85% 0.0177 250.22)",
+          "oklch(95% 0.0059 250.22)"
+        ]
+      },
+      "dark-muted-ink": {
+        "role": "neutral",
+        "displayName": "Dark Muted Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0102 248.25)",
+          "oklch(26% 0.0177 248.25)",
+          "oklch(37% 0.0252 248.25)",
+          "oklch(49% 0.0334 248.25)",
+          "oklch(61% 0.0266 248.25)",
+          "oklch(73% 0.0184 248.25)",
+          "oklch(85% 0.0102 248.25)",
+          "oklch(95% 0.0034 248.25)"
+        ]
+      },
+      "dark-accent": {
+        "role": "neutral",
+        "displayName": "Dark Accent",
+        "tonalRamp": [
+          "oklch(15% 0.0222 252.44)",
+          "oklch(26% 0.0385 252.44)",
+          "oklch(37% 0.0548 252.44)",
+          "oklch(49% 0.0726 252.44)",
+          "oklch(61% 0.0578 252.44)",
+          "oklch(73% 0.0400 252.44)",
+          "oklch(85% 0.0222 252.44)",
+          "oklch(95% 0.0074 252.44)"
+        ]
+      },
+      "dark-destructive": {
+        "role": "secondary",
+        "displayName": "Dark Destructive",
+        "tonalRamp": [
+          "oklch(15% 0.0357 21.95)",
+          "oklch(26% 0.0619 21.95)",
+          "oklch(37% 0.0881 21.95)",
+          "oklch(49% 0.1166 21.95)",
+          "oklch(61% 0.0928 21.95)",
+          "oklch(73% 0.0643 21.95)",
+          "oklch(85% 0.0357 21.95)",
+          "oklch(95% 0.0119 21.95)"
+        ]
+      },
+      "dark-border": {
+        "role": "neutral",
+        "displayName": "Dark Border",
+        "tonalRamp": [
+          "oklch(15% 0.0150 251.39)",
+          "oklch(26% 0.0261 251.39)",
+          "oklch(37% 0.0371 251.39)",
+          "oklch(49% 0.0492 251.39)",
+          "oklch(61% 0.0391 251.39)",
+          "oklch(73% 0.0271 251.39)",
+          "oklch(85% 0.0150 251.39)",
+          "oklch(95% 0.0050 251.39)"
+        ]
+      },
+      "dark-input": {
+        "role": "neutral",
+        "displayName": "Dark Input Border",
+        "tonalRamp": [
+          "oklch(15% 0.0145 247.74)",
+          "oklch(26% 0.0251 247.74)",
+          "oklch(37% 0.0358 247.74)",
+          "oklch(49% 0.0474 247.74)",
+          "oklch(61% 0.0377 247.74)",
+          "oklch(73% 0.0261 247.74)",
+          "oklch(85% 0.0145 247.74)",
+          "oklch(95% 0.0048 247.74)"
+        ]
+      },
+      "dark-gold-tint": {
+        "role": "neutral",
+        "displayName": "Dark Gold Tint",
+        "tonalRamp": [
+          "oklch(15% 0.0093 89.20)",
+          "oklch(26% 0.0162 89.20)",
+          "oklch(37% 0.0230 89.20)",
+          "oklch(49% 0.0305 89.20)",
+          "oklch(61% 0.0243 89.20)",
+          "oklch(73% 0.0168 89.20)",
+          "oklch(85% 0.0093 89.20)",
+          "oklch(95% 0.0031 89.20)"
+        ]
+      },
+      "dark-red-tint": {
+        "role": "neutral",
+        "displayName": "Dark Red Tint",
+        "tonalRamp": [
+          "oklch(15% 0.0109 353.35)",
+          "oklch(26% 0.0188 353.35)",
+          "oklch(37% 0.0268 353.35)",
+          "oklch(49% 0.0355 353.35)",
+          "oklch(61% 0.0283 353.35)",
+          "oklch(73% 0.0196 353.35)",
+          "oklch(85% 0.0109 353.35)",
+          "oklch(95% 0.0036 353.35)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Brand Statement",
+        "purpose": "Desktop login brand statement; 54px at the navigation breakpoint."
+      },
+      "auth-title": {
+        "displayName": "Sign-in Title",
+        "purpose": "Login heading; 29px below 768px."
+      },
+      "headline": {
+        "displayName": "Page Title",
+        "purpose": "Main route headings; 25px below 768px."
+      },
+      "title": {
+        "displayName": "Section Title",
+        "purpose": "Compact sections and content group headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Application copy and standard desktop control text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Visible form labels and supporting action labels."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Dates, authors and record metadata; status labels use weight 700."
+      },
+      "metric": {
+        "displayName": "Metric",
+        "purpose": "Tabular totals on overview and reports; 27px below 768px."
+      }
+    },
+    "shadows": [
+      {
+        "name": "overlay-medium",
+        "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "purpose": "Menus, selects and popovers; inherited Tailwind shadow-md."
+      },
+      {
+        "name": "dialog-large",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "Dialog surfaces; inherited Tailwind shadow-lg. Main workspace cards have no shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "navigation-colors",
+        "value": "background-color 150ms ease, color 150ms ease",
+        "purpose": "Sidebar hover and active-color changes."
+      },
+      {
+        "name": "control-transition",
+        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Shared button/input color and focus state transitions."
+      },
+      {
+        "name": "dialog-transition",
+        "value": "200ms",
+        "purpose": "Dialog fade and 95% scale enter/exit transitions."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "Animation and transition duration under prefers-reduced-motion: reduce; one animation iteration."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "dialog-wide",
+        "value": "640px"
+      },
+      {
+        "name": "multi-column",
+        "value": "768px"
+      },
+      {
+        "name": "desktop-navigation",
+        "value": "1024px"
+      },
+      {
+        "name": "record-tables",
+        "value": "1200px"
+      },
+      {
+        "name": "workspace-width-cap",
+        "value": "1600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The principal library task, using the active theme’s primary pair.",
+      "html": "<button class=\"ds-button-primary\" type=\"button\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg>New checkout</button>",
+      "css": ".ds-button-primary{box-sizing:border-box;font-family:var(--font-sans,\"Nunito Variable\",\"Noto Sans Ethiopic Variable\",sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:8px 16px;border:0;border-radius:var(--radius-md,10px);font-size:14px;line-height:20px;font-weight:700;white-space:nowrap;text-decoration:none;cursor:pointer;transition:color 150ms cubic-bezier(.4,0,.2,1),background-color 150ms cubic-bezier(.4,0,.2,1),box-shadow 150ms cubic-bezier(.4,0,.2,1);padding-left:12px;padding-right:12px;background:var(--primary,#044592);color:var(--primary-foreground,#fff);}.ds-button-primary:hover{background:color-mix(in srgb,var(--primary,#044592) 90%,transparent);}.ds-button-primary:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#044592) 50%,transparent);}.ds-button-primary:disabled{pointer-events:none;opacity:.5;}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition-duration:.01ms;}}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "A bordered secondary action on the frame surface.",
+      "html": "<button class=\"ds-button-outline\" type=\"button\">Cancel</button>",
+      "css": ".ds-button-outline{box-sizing:border-box;font-family:var(--font-sans,\"Nunito Variable\",\"Noto Sans Ethiopic Variable\",sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:8px 16px;border:0;border-radius:var(--radius-md,10px);font-size:14px;line-height:20px;font-weight:700;white-space:nowrap;text-decoration:none;cursor:pointer;transition:color 150ms cubic-bezier(.4,0,.2,1),background-color 150ms cubic-bezier(.4,0,.2,1),box-shadow 150ms cubic-bezier(.4,0,.2,1);border:1px solid var(--border,#e6e8e5);background:var(--background,#fefbe9);color:var(--foreground,#152e4c);}.ds-button-outline:hover{background:var(--accent,#edf3fa);color:var(--accent-foreground,#044592);}.ds-button-outline:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#044592) 50%,transparent);}.ds-button-outline:disabled{pointer-events:none;opacity:.5;}:host-context(.dark) .ds-button-outline{background:color-mix(in srgb,var(--input,#526b83) 30%,transparent);border-color:var(--input,#526b83);}:host-context(.dark) .ds-button-outline:hover{background:color-mix(in srgb,var(--input,#526b83) 50%,transparent);}@media(prefers-reduced-motion:reduce){.ds-button-outline{transition-duration:.01ms;}}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A warm, lower-emphasis action.",
+      "html": "<button class=\"ds-button-secondary\" type=\"button\">Secondary action</button>",
+      "css": ".ds-button-secondary{box-sizing:border-box;font-family:var(--font-sans,\"Nunito Variable\",\"Noto Sans Ethiopic Variable\",sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:8px 16px;border:0;border-radius:var(--radius-md,10px);font-size:14px;line-height:20px;font-weight:700;white-space:nowrap;text-decoration:none;cursor:pointer;transition:color 150ms cubic-bezier(.4,0,.2,1),background-color 150ms cubic-bezier(.4,0,.2,1),box-shadow 150ms cubic-bezier(.4,0,.2,1);background:var(--secondary,#f5eed8);color:var(--secondary-foreground,#153b64);}.ds-button-secondary:hover{background:color-mix(in srgb,var(--secondary,#f5eed8) 80%,transparent);}.ds-button-secondary:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#044592) 50%,transparent);}.ds-button-secondary:disabled{pointer-events:none;opacity:.5;}@media(prefers-reduced-motion:reduce){.ds-button-secondary{transition-duration:.01ms;}}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "A quiet action within a record or toolbar.",
+      "html": "<button class=\"ds-button-ghost\" type=\"button\">Refresh</button>",
+      "css": ".ds-button-ghost{box-sizing:border-box;font-family:var(--font-sans,\"Nunito Variable\",\"Noto Sans Ethiopic Variable\",sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:8px 16px;border:0;border-radius:var(--radius-md,10px);font-size:14px;line-height:20px;font-weight:700;white-space:nowrap;text-decoration:none;cursor:pointer;transition:color 150ms cubic-bezier(.4,0,.2,1),background-color 150ms cubic-bezier(.4,0,.2,1),box-shadow 150ms cubic-bezier(.4,0,.2,1);background:transparent;color:var(--foreground,#152e4c);}.ds-button-ghost:hover{background:var(--accent,#edf3fa);color:var(--accent-foreground,#044592);}.ds-button-ghost:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#044592) 50%,transparent);}.ds-button-ghost:disabled{pointer-events:none;opacity:.5;}:host-context(.dark) .ds-button-ghost:hover{background:color-mix(in srgb,var(--accent,#1b3c60) 50%,transparent);}@media(prefers-reduced-motion:reduce){.ds-button-ghost{transition-duration:.01ms;}}"
+    },
+    {
+      "name": "Link Button",
+      "kind": "button",
+      "refersTo": "button-link",
+      "description": "A text action to another record or collection.",
+      "html": "<a class=\"ds-button-link\" href=\"#book-collection\">Find the next read</a>",
+      "css": ".ds-button-link{box-sizing:border-box;font-family:var(--font-sans,\"Nunito Variable\",\"Noto Sans Ethiopic Variable\",sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:8px 16px;border:0;border-radius:var(--radius-md,10px);font-size:14px;line-height:20px;font-weight:700;white-space:nowrap;text-decoration:none;cursor:pointer;transition:color 150ms cubic-bezier(.4,0,.2,1),background-color 150ms cubic-bezier(.4,0,.2,1),box-shadow 150ms cubic-bezier(.4,0,.2,1);background:transparent;color:var(--primary,#044592);text-underline-offset:4px;}.ds-button-link:hover{text-decoration:underline;}.ds-button-link:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#044592) 50%,transparent);}.ds-button-link:disabled{pointer-events:none;opacity:.5;}@media(prefers-reduced-motion:reduce){.ds-button-link{transition-duration:.01ms;}}"
+    },
+    {
+      "name": "Destructive Button",
+      "kind": "button",
+      "refersTo": "button-destructive",
+      "description": "A consequential action, presented within the existing confirmation flow.",
+      "html": "<button class=\"ds-button-destructive\" type=\"button\">Delete member</button>",
+      "css": ".ds-button-destructive{box-sizing:border-box;font-family:var(--font-sans,\"Nunito Variable\",\"Noto Sans Ethiopic Variable\",sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:8px 16px;border:0;border-radius:var(--radius-md,10px);font-size:14px;line-height:20px;font-weight:700;white-space:nowrap;text-decoration:none;cursor:pointer;transition:color 150ms cubic-bezier(.4,0,.2,1),background-color 150ms cubic-bezier(.4,0,.2,1),box-shadow 150ms cubic-bezier(.4,0,.2,1);background:#cf1418;color:#fff;}.ds-button-destructive:hover{background:#b71117;}.ds-button-destructive:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#044592) 50%,transparent);}.ds-button-destructive:disabled{pointer-events:none;opacity:.5;}:host-context(.dark) .ds-button-destructive{background:#ac242b;}@media(prefers-reduced-motion:reduce){.ds-button-destructive{transition-duration:.01ms;}}"
+    },
+    {
+      "name": "Labelled Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "A visible field label, clear input boundary and shared keyboard-focus treatment.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-email\">Email address</label><input class=\"ds-input\" id=\"ds-email\" type=\"email\" placeholder=\"you@example.com\" autocomplete=\"email\"/></div>",
+      "css": ".ds-field{font-family:var(--font-sans,\"Nunito Variable\",\"Noto Sans Ethiopic Variable\",sans-serif);display:grid;gap:9px;color:var(--foreground,#152e4c);max-width:380px;}.ds-field-label{font-size:13px;line-height:1.5;font-weight:700;}.ds-input{box-sizing:border-box;font-family:var(--font-sans,\"Nunito Variable\",\"Noto Sans Ethiopic Variable\",sans-serif);width:100%;min-width:0;height:40px;padding:8px 12px;border:1px solid var(--input,#c9d2d9);border-radius:var(--radius-md,10px);background:var(--card,#fff);color:var(--foreground,#152e4c);font-size:16px;caret-color:var(--primary,#044592);transition:color 150ms cubic-bezier(.4,0,.2,1),box-shadow 150ms cubic-bezier(.4,0,.2,1);}.ds-input::placeholder{color:var(--muted-foreground,#596878);}.ds-input:focus-visible{border-color:var(--ring,#044592);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#044592) 50%,transparent);}.ds-input[aria-invalid=true]{border-color:var(--destructive,#b71921);box-shadow:0 0 0 3px color-mix(in srgb,var(--destructive,#b71921) 20%,transparent);}.ds-input:disabled{pointer-events:none;cursor:not-allowed;opacity:.5;}:host-context(.dark) .ds-input{background:color-mix(in srgb,var(--input,#526b83) 30%,transparent);}:host-context(.dark) .ds-input[aria-invalid=true]{box-shadow:0 0 0 3px color-mix(in srgb,var(--destructive,#ff9c99) 40%,transparent);}@media(min-width:768px){.ds-input{font-size:14px;}}@media(prefers-reduced-motion:reduce){.ds-input{transition-duration:.01ms;}}"
+    },
+    {
+      "name": "Labelled Navigation",
+      "kind": "nav",
+      "refersTo": "nav-active",
+      "description": "The shared sidebar’s labelled SVG rows, including the implemented Reports destination.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Library navigation\"><a class=\"ds-nav-link ds-nav-active\" href=\"/\" aria-current=\"page\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/></svg><span>Overview</span></a><a class=\"ds-nav-link\" href=\"/books\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 7v14M3 3h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5v17h-5a4 4 0 0 0-4 1 4 4 0 0 0-4-1H3z\"/></svg><span>Book collection</span></a><a class=\"ds-nav-link\" href=\"/reports\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 3v18h18M7 14v3M12 9v8M17 5v12\"/></svg><span>Reports</span></a></nav>",
+      "css": ".ds-nav{font-family:var(--font-sans,\"Nunito Variable\",\"Noto Sans Ethiopic Variable\",sans-serif);display:grid;gap:5px;width:204px;padding:14px;background:var(--sidebar,#fefbe9);}.ds-nav-link{box-sizing:border-box;display:flex;align-items:center;gap:12px;min-height:44px;padding:10px 12px;border-radius:9px;color:var(--muted-foreground,#596878);font-size:14px;line-height:1.5;font-weight:600;text-decoration:none;transition:background-color 150ms,color 150ms;}.ds-nav-link>svg{flex:none;}.ds-nav-link:hover{color:var(--foreground,#152e4c);background:color-mix(in srgb,var(--sidebar-accent,#e9eff5) 65%,transparent);}.ds-nav-link.ds-nav-active{color:var(--sidebar-accent-foreground,#044592);background:var(--sidebar-accent,#e9eff5);font-weight:800;}.ds-nav-link:focus-visible{outline:2px solid var(--ring,#044592);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-nav-link{transition-duration:.01ms;}}"
+    },
+    {
+      "name": "Circulation Status Labels",
+      "kind": "chip",
+      "refersTo": "status",
+      "description": "Noninteractive text labels for available, loan and overdue states; color reinforces the words.",
+      "html": "<div class=\"ds-status-row\"><span class=\"ds-status\">Available</span><span class=\"ds-status ds-status-gold\">On loan</span><span class=\"ds-status ds-status-red\">Overdue</span></div>",
+      "css": ".ds-status-row{font-family:var(--font-sans,\"Nunito Variable\",\"Noto Sans Ethiopic Variable\",sans-serif);display:flex;flex-wrap:wrap;gap:8px;}.ds-status{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:5px;background:var(--blue-tint,#edf3fa);color:var(--accent-foreground,#044592);font-size:12px;line-height:1.5;font-weight:700;white-space:nowrap;}.ds-status-gold{background:var(--gold-tint,#fff4d8);color:var(--gold-ink,#785510);}.ds-status-red{background:var(--red-tint,#fff0ef);color:var(--destructive,#b71921);}"
+    },
+    {
+      "name": "Book Card with Fallback Jacket",
+      "kind": "card",
+      "refersTo": "book-card",
+      "description": "The collection’s bordered record card; a generated title-led jacket honestly represents a missing cover.",
+      "html": "<article class=\"ds-book-card\"><div class=\"ds-book-art\"><div class=\"ds-book-jacket\" role=\"img\" aria-label=\"No cover image for Example book\"><strong>Example book</strong><small>Example author</small></div><span class=\"ds-book-status\">Available</span></div><div class=\"ds-book-body\"><a class=\"ds-book-title\" href=\"#book-detail\">Example book</a><p class=\"ds-book-author\">Example author</p><div class=\"ds-book-meta\"><span>Category</span><span>Shelf A1</span></div><div class=\"ds-book-actions\"><a class=\"ds-book-action\" href=\"#book-detail\">View book<svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></a></div></div></article>",
+      "css": ".ds-book-art,.ds-book-jacket{box-sizing:border-box;}.ds-book-card{font-family:var(--font-sans,\"Nunito Variable\",\"Noto Sans Ethiopic Variable\",sans-serif);width:280px;max-width:100%;border:1px solid var(--border,#e6e8e5);border-radius:12px;overflow:hidden;background:var(--card,#fff);color:var(--foreground,#152e4c);}.ds-book-art{position:relative;display:flex;align-items:center;justify-content:center;height:195px;padding:22px;background:var(--muted,#f5f5ee);}.ds-book-jacket{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;width:106px;height:148px;padding:15px 11px;border:1px solid #d5dfeb;border-left-color:#c0cfe1;border-radius:2px 5px 5px 2px;background:#e8eff5;color:#123a65;}.ds-book-jacket strong{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;font-size:15px;font-weight:800;line-height:1.25;}.ds-book-jacket small{font-size:12px;line-height:1.3;margin-top:12px;opacity:.9;}.ds-book-status{position:absolute;top:12px;right:12px;border-radius:5px;padding:3px 7px;background:var(--blue-tint,#edf3fa);color:var(--accent-foreground,#044592);font-size:12px;line-height:1.5;font-weight:700;}.ds-book-body{padding:18px;}.ds-book-title{display:block;color:inherit;text-decoration:none;font-size:15px;font-weight:800;line-height:1.4;}.ds-book-title:hover{color:var(--primary,#044592);}.ds-book-author{margin:5px 0 0;color:var(--muted-foreground,#596878);font-size:13px;line-height:1.5;}.ds-book-meta{display:flex;justify-content:space-between;gap:12px;margin-top:16px;color:var(--muted-foreground,#596878);font-size:12px;line-height:1.5;}.ds-book-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border,#e6e8e5);}.ds-book-action{display:inline-flex;align-items:center;gap:6px;height:32px;border-radius:10px;color:var(--primary,#044592);font-size:14px;line-height:20px;font-weight:700;text-decoration:none;transition:background-color 150ms cubic-bezier(.4,0,.2,1);}.ds-book-action:hover{background:var(--accent,#edf3fa);color:var(--accent-foreground,#044592);}.ds-book-title:focus-visible{outline:2px solid var(--ring,#044592);outline-offset:4px;}.ds-book-action:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#044592) 50%,transparent);}@media(max-width:767px){.ds-book-art{height:172px;padding:18px 10px;}.ds-book-jacket{width:86px;height:126px;}.ds-book-status{top:8px;right:8px;}.ds-book-body{padding:12px;}.ds-book-title{font-size:13px;}.ds-book-meta{flex-direction:column;gap:4px;}.ds-book-actions{flex-wrap:wrap;}}@media(prefers-reduced-motion:reduce){.ds-book-action{transition-duration:.01ms;}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Word, held open.",
+    "overview": "A welcoming, well-kept church library. The supplied Berea identity makes the workspace reverent, warm, clear and rooted: a Parchment frame around a white working sheet, rounded Nunito type, Covenant Blue actions and a little Gold. Books and readers carry the content; restrained borders and compact lists keep recurring library work easy to scan.\n\nThe identity comes from the supplied 2026 brand guidelines, as recorded in [PRODUCT.md](PRODUCT.md) and [brand-assets.md](docs/brand-assets.md). Latin and Amharic share one font stack. The icon-only emblem retains its blue background and gold ring. `public/brand/berea-icon.svg` is a path-based conversion from the PDF's raster emblem, without a wordmark; it is not the original vector master. The separate shared ChatGPT logo link remains inaccessible and its artwork unverified.",
+    "keyCharacteristics": [
+      "A labelled navigation frame and one continuous working sheet.",
+      "Clear blue actions, warm gold attention and meaningful status text.",
+      "Friendly, heavy headings with quiet supporting information.",
+      "Title-led fallback book jackets and compact circulation records."
+    ],
+    "rules": [
+      {
+        "name": "The Meaning Before Color Rule",
+        "body": "Every availability, loan and overdue state has a readable text label. Color reinforces that label; it does not replace it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Shared Script Rule",
+        "body": "Retain the Nunito / Noto Sans Ethiopic stack on controls and content so Latin and Amharic remain part of the same interface.",
+        "section": "typography"
+      },
+      {
+        "name": "The Framed Workspace Rule",
+        "body": "Keep page titles, filters and records inside the shared sheet. Reduce the frame at the observed responsive breakpoints and keep row actions available when records become cards.",
+        "section": "layout"
+      }
+    ],
+    "dos": [
+      "**Do** use the supplied Berea palette and self-hosted Nunito / Noto Sans Ethiopic stack.",
+      "**Do** preserve the icon-only emblem's blue background, gold ring and internal artwork.",
+      "**Do** use the shared shell, meaningful status labels and visible focus treatment across routes.",
+      "**Do** let actual records drive totals, availability, empty states and error states.",
+      "**Do** preserve visible record actions when tables become cards below the compact-layout breakpoint."
+    ],
+    "donts": [
+      "**Don't** add a wordmark to the requested icon asset or describe its PDF conversion as an original vector master.",
+      "**Don't** claim the inaccessible shared ChatGPT artwork has been matched or verified.",
+      "**Don't** introduce decorative stock imagery, invented statistics or illustrative publisher covers.",
+      "**Don't** turn the flat workspace cards into floating shadow stacks; reserve the existing shadows for overlays.",
+      "**Don't** rely on color alone for a circulation state or replace the supplied Parchment with an unrelated generic palette."
+    ]
+  }
+}

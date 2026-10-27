@@ -1,12 +1,13 @@
-import { Calendar, Grid, List, Loader2Icon, Plus, Search } from "lucide-react";
-import { useState } from "react";
+import { Grid2X2, List, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import CheckoutCard from "../../components/BooksPage/CheckoutCard";
 import CheckoutRow from "../../components/checkout/CheckoutRow";
+import { EmptyState, LoadError } from "../../components/empty-state";
 import { PageHeader } from "../../components/page-header";
 import { CheckoutBookDialog } from "../../components/sidebar";
-import { Button } from "../../components/ui/button";
-import { Card, CardContent } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
+import { Skeleton } from "../../components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -23,193 +24,144 @@ import {
 } from "../../components/ui/table";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import useCheckouts from "../../hooks/checkout/useCheckouts";
+import { useCompactLayout } from "../../hooks/useCompactLayout";
 import type Checkout from "../../models/Checkout";
 
-type ViewMode = "table" | "cards";
-
-export default function CheckoutsPage() {
-  const { data: checkouts, isLoading } = useCheckouts();
-  const [viewMode, setViewMode] = useState<ViewMode>("table");
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const params = new URLSearchParams(window.location.search);
-  const filter = params.get("filter");
-
-  const [statusFilter, setStatusFilter] = useState(
-    filter === "overdue" ? "false" : "all",
+const daysUntilReturn = (checkout: Checkout) =>
+  Math.ceil(
+    (new Date(checkout.return_date).getTime() - Date.now()) / 86_400_000,
   );
 
-  const getDaysRemaining = (checkout: Checkout) => {
-    const now = new Date();
-    const returnDate = checkout.return_date
-      ? new Date(checkout.return_date)
-      : null;
-    const daysRemaining = returnDate
-      ? Math.ceil(
-          (returnDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-        )
-      : 0;
-
-    return daysRemaining;
-  };
-
-  const filteredCheckouts = checkouts?.filter((checkout) => {
-    const daysRemaining = getDaysRemaining(checkout);
-
-    const matchesSearch =
-      checkout.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      checkout.book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      checkout.book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      checkout.user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" ||
-      daysRemaining <= 0 === (statusFilter === "false");
-
-    return matchesSearch && matchesStatus;
-  });
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2Icon className="animate-spin" />
-      </div>
-    );
-  }
+export default function CheckoutsPage() {
+  const { data: checkouts = [], isLoading, isError, refetch } = useCheckouts();
+  const [params] = useSearchParams();
+  const overdue = params.get("filter") === "overdue";
+  const [filter, setFilter] = useState(overdue ? "overdue" : "all");
+  const [search, setSearch] = useState("");
+  const [view, setView] = useState("table");
+  const compact = useCompactLayout();
+  useEffect(() => {
+    setFilter(overdue ? "overdue" : "all");
+  }, [overdue]);
+  const filtered = checkouts.filter(
+    (checkout) =>
+      `${checkout.user.name} ${checkout.user.email} ${checkout.book.title} ${checkout.book.author}`
+        .toLowerCase()
+        .includes(search.toLowerCase()) &&
+      (filter === "all" ||
+        (filter === "overdue"
+          ? daysUntilReturn(checkout) <= 0
+          : daysUntilReturn(checkout) > 0)),
+  );
   return (
-    <div className="space-y-6">
+    <div className="page">
       <PageHeader
-        title="Book Check-outs"
-        description="Manage book loans and returns"
+        title="Checkouts & returns"
+        description="Keep good books moving, and help them find their way home."
       >
-        <div className="flex items-center space-x-2">
-          <ToggleGroup
-            type="single"
-            value={viewMode}
-            onValueChange={(value) => value && setViewMode(value as ViewMode)}
-          >
-            <ToggleGroupItem value="table" aria-label="Table view">
-              <List className="h-4 w-4" />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="cards" aria-label="Card view">
-              <Grid className="h-4 w-4" />
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <CheckoutBookDialog
-            childButton={
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                New Check-out
-              </Button>
-            }
-          />
-        </div>
+        <CheckoutBookDialog />
       </PageHeader>
-
-      <div className="px-4 sm:px-6 lg:px-8">
-        <Card>
-          <CardContent className="p-6">
-            {/* Search and Filters */}
-            <div className="mb-6 flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-              <div className="relative flex-1">
-                <Search className="top-3/5 absolute left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                <Input
-                  placeholder="Search by member name, book title, or email..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="flex space-x-2">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-32">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="true">Active</SelectItem>
-                    <SelectItem value="false">Overdue</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+      <div className="page-content">
+        <div className="collection-toolbar">
+          <div className="collection-search">
+            <Search size={17} />
+            <Input
+              aria-label="Search checkouts"
+              placeholder="Find a book or a reader…"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </div>
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger aria-label="Filter checkouts">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All checkouts</SelectItem>
+              <SelectItem value="active">On loan</SelectItem>
+              <SelectItem value="overdue">Due & overdue</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="collection-summary">
+          <p aria-live="polite">
+            {isLoading
+              ? "Checking the circulation desk…"
+              : `${filtered.length} ${filtered.length === 1 ? "checkout" : "checkouts"} on this page`}
+          </p>
+          {!compact && (
+            <ToggleGroup
+              type="single"
+              value={view}
+              onValueChange={(value) => value && setView(value)}
+            >
+              <ToggleGroupItem value="table" aria-label="Table view">
+                <List size={16} />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="cards" aria-label="Card view">
+                <Grid2X2 size={16} />
+              </ToggleGroupItem>
+            </ToggleGroup>
+          )}
+        </div>
+        {isError ? (
+          <LoadError onRetry={() => void refetch()} />
+        ) : isLoading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 5 }, (_, i) => (
+              <Skeleton key={i} className="h-16 w-full" />
+            ))}
+          </div>
+        ) : filtered.length ? (
+          compact || view === "cards" ? (
+            <div className="category-grid">
+              {filtered.map((checkout) => (
+                <CheckoutCard key={checkout.id} checkout={checkout} />
+              ))}
             </div>
-
-            {/* Results count */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-600">
-                Showing {filteredCheckouts?.length} of {checkouts?.length}{" "}
-                check-outs
-              </p>
+          ) : (
+            <div className="table-frame">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Reader</TableHead>
+                    <TableHead>Book</TableHead>
+                    <TableHead>Return by</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="hidden text-right lg:table-cell">
+                      Renewals
+                    </TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((checkout) => (
+                    <CheckoutRow
+                      key={checkout.id}
+                      checkout={checkout}
+                      daysRemaining={daysUntilReturn(checkout)}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
             </div>
-
-            {/* Table View */}
-            {viewMode === "table" && (
-              <div className="overflow-x-auto rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Member</TableHead>
-                      <TableHead>Book</TableHead>
-                      <TableHead className="hidden sm:table-cell">
-                        Checkout Date
-                      </TableHead>
-                      <TableHead>Due Date</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="hidden lg:table-cell">
-                        Renewals
-                      </TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredCheckouts?.map((checkout) => {
-                      const daysRemaining = getDaysRemaining(checkout);
-
-                      return (
-                        <CheckoutRow
-                          checkout={checkout}
-                          daysRemaining={daysRemaining}
-                          key={checkout.id}
-                        />
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-
-            {/* Card View */}
-            {viewMode === "cards" && (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredCheckouts?.map((checkout) => (
-                  <CheckoutCard key={checkout.id} checkout={checkout} />
-                ))}
-              </div>
-            )}
-
-            {/* Empty state */}
-            {filteredCheckouts?.length === 0 && (
-              <div className="py-12 text-center">
-                <Calendar className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                <h3 className="mb-2 text-lg font-medium text-gray-900">
-                  No check-outs found
-                </h3>
-                <p className="mb-4 text-gray-500">
-                  {searchTerm || statusFilter !== "all"
-                    ? "Try adjusting your search or filters"
-                    : "No books are currently checked out"}
-                </p>
-                <CheckoutBookDialog
-                  childButton={
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" />
-                      New Check-out
-                    </Button>
-                  }
-                />
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          )
+        ) : (
+          <EmptyState
+            title={
+              search || filter !== "all"
+                ? "No matching checkouts"
+                : "All books are home"
+            }
+            description={
+              search || filter !== "all"
+                ? "Try another reader, title, or checkout filter."
+                : "When a reader borrows a book, record its journey here."
+            }
+          >
+            <CheckoutBookDialog />
+          </EmptyState>
+        )}
       </div>
     </div>
   );

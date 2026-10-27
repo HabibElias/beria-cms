@@ -1,21 +1,24 @@
 import { Link } from "react-router-dom";
+import { BrandMark } from "./brand-mark";
+import { Button } from "./ui/button";
 
-const SmtError = ({ message = "An unexpected error has occurred." }) => {
+export default function SmtError() {
   return (
-    <div className="font-[poppins]">
-      <div className="flex h-[80vh] flex-col items-center justify-center">
-        <h1 className="mb-4 text-4xl font-bold text-blue-600">500</h1>
-        <h1 className="mb-4 text-4xl font-bold dark:text-gray-100">Error</h1>
-        <p className="mb-6 text-lg dark:text-gray-400">{message}</p>
-        <Link
-          to="/"
-          className="rounded bg-blue-700 px-6 py-2 text-white transition hover:bg-blue-900"
-        >
-          Go to Homepage
-        </Link>
+    <main className="account-help">
+      <div>
+        <BrandMark size={58} />
+        <h1>A little pause in the story.</h1>
+        <p>
+          Something interrupted this page. Please try loading it again, or
+          return to your library.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={() => window.location.reload()}>Try again</Button>
+          <Button asChild variant="outline">
+            <Link to="/">Back to the library</Link>
+          </Button>
+        </div>
       </div>
-    </div>
+    </main>
   );
-};
-
-export default SmtError;
+}

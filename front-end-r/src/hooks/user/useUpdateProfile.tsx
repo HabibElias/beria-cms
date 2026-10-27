@@ -1,9 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import apiClient from "../../services/Apiclient";
 import { toast } from "sonner";
+import { useAuth } from "../../provider/AuthProvider";
 import type { UserProfileFormData } from "../../models/UserSchema";
 
 const useUpdateProfile = () => {
+  const { updateUserProfile } = useAuth();
   return useMutation({
     mutationFn: async (data: UserProfileFormData) => {
       const res = await apiClient.post("/user/profile", data);
@@ -18,7 +20,8 @@ const useUpdateProfile = () => {
           "Failed to update profile",
       );
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
+      if (response.user) updateUserProfile(response.user);
       toast.success("Profile updated successfully!");
     },
   });

@@ -22,4 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env
+.env*
+!.env.example
+!.env.production
+.vercel/
+
+# Local design-tool runtime and visual review artifacts.
+.impeccable/questions/
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/live/
+.impeccable/config.local.json

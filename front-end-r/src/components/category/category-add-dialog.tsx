@@ -44,6 +44,7 @@ export default function CategoryAddDialog({
       onSuccess: () => {
         toast.success("Category Created Successfully");
         reset();
+        setOpen(false);
       },
     });
   };
@@ -58,7 +59,7 @@ export default function CategoryAddDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="font-[poppins]">
+      <DialogContent className="font-sans">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>Add Category</DialogTitle>
@@ -69,7 +70,7 @@ export default function CategoryAddDialog({
 
           <div className="mt-5">
             <Label htmlFor="name">
-              Name <span className="text-red-400">*</span>
+              Name <span className="text-destructive">*</span>
             </Label>
             <Input
               placeholder="Theology"
@@ -78,7 +79,7 @@ export default function CategoryAddDialog({
               {...register("name")}
             />
             {errors.name && (
-              <p className="mt-2 text-xs text-red-400">{errors.name.message}</p>
+              <p className="mt-2 text-xs text-destructive">{errors.name.message}</p>
             )}
           </div>
 

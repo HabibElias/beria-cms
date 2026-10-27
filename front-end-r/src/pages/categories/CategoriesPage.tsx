@@ -1,59 +1,56 @@
-import { BookAIcon, Loader2Icon, Plus } from "lucide-react";
 import CategoryAddDialog from "../../components/category/category-add-dialog";
 import CategoryCard from "../../components/category/category-card";
+import { EmptyState, LoadError } from "../../components/empty-state";
 import { PageHeader } from "../../components/page-header";
-import { Button } from "../../components/ui/button";
+import { Skeleton } from "../../components/ui/skeleton";
 import useCategories from "../../hooks/category/useCategories";
 
-const CategoriesPage = () => {
-  const { data: categories, isLoading } = useCategories();
-
+export default function CategoriesPage() {
+  const {
+    data: categories = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useCategories();
   return (
-    <div>
+    <div className="page">
       <PageHeader
-        title="Book Categories"
-        description="Organize your books with categories"
+        title="A place for every book"
+        description="Thoughtful categories help readers find their way."
       >
-        <div className="flex items-center space-x-2">
-          <CategoryAddDialog />
-        </div>
+        <CategoryAddDialog />
       </PageHeader>
-
-      {isLoading && (
-        <div className="flex h-[75vh] w-full items-center justify-center">
-          <Loader2Icon className="animate-spin" />
-        </div>
-      )}
-
-      {/* Empty state */}
-      {!isLoading && categories?.length === 0 && (
-        <div className="flex h-[75vh] flex-col items-center justify-center py-12 text-center">
-          <BookAIcon className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-          <h3 className="mb-2 text-lg font-medium text-gray-900">
-            No category found
-          </h3>
-          <p className="mb-4 text-gray-500">No categories so far</p>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Category
-          </Button>
-        </div>
-      )}
-
-      {categories && categories.length > 0 && (
-        <div className="px-4 py-4 sm:px-6 lg:px-8">
-          <h2 className="text-accent-foreground/60 mb-5 text-2xl font-bold">
-            Categories
-          </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((cat, index) => (
-              <CategoryCard cat={cat} key={index} />
+      <div className="page-content">
+        {isError ? (
+          <LoadError onRetry={() => void refetch()} />
+        ) : isLoading ? (
+          <div className="category-grid">
+            {Array.from({ length: 6 }, (_, i) => (
+              <Skeleton className="h-40 w-full" key={i} />
             ))}
           </div>
-        </div>
-      )}
+        ) : categories.length ? (
+          <>
+            <p className="text-muted-foreground mb-5 text-xs">
+              {categories.length}{" "}
+              {categories.length === 1 ? "category" : "categories"} in the
+              collection
+            </p>
+            <div className="category-grid">
+              {categories.map((category) => (
+                <CategoryCard key={category.id} cat={category} />
+              ))}
+            </div>
+          </>
+        ) : (
+          <EmptyState
+            title="Give the collection a little structure"
+            description="Create a category so the first books can find their shelves."
+          >
+            <CategoryAddDialog />
+          </EmptyState>
+        )}
+      </div>
     </div>
   );
-};
-
-export default CategoriesPage;
+}

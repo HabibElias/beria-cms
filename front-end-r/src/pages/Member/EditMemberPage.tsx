@@ -100,7 +100,7 @@ export default function EditMemberPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Edit Member" description="Update member information">
+      <PageHeader title="Edit member details" description="Update member information">
         <Button variant="outline" asChild>
           <Link to="/members">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -112,7 +112,7 @@ export default function EditMemberPage() {
         <div className="mx-auto max-w-3xl">
           <Card>
             <CardHeader>
-              <CardTitle>Edit Member</CardTitle>
+              <CardTitle>Edit member details</CardTitle>
               <CardDescription>
                 Update the member by editing the following information
               </CardDescription>
@@ -121,7 +121,7 @@ export default function EditMemberPage() {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-3">
                   <Label htmlFor="name">
-                    Name <span className="text-red-400">*</span>
+                    Name <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     placeholder="Shanko Dolche"
@@ -130,14 +130,14 @@ export default function EditMemberPage() {
                     {...register("name")}
                   />
                   {errors.name && (
-                    <p className="my-2 text-xs text-red-400">
+                    <p className="my-2 text-xs text-destructive">
                       {errors.name.message}
                     </p>
                   )}
                 </div>
                 <div className="mb-3">
                   <Label htmlFor="email">
-                    Email <span className="text-red-400">*</span>
+                    Email <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     placeholder="example@gmail.com"
@@ -146,14 +146,14 @@ export default function EditMemberPage() {
                     {...register("email")}
                   />
                   {errors.email && (
-                    <p className="my-2 text-xs text-red-400">
+                    <p className="my-2 text-xs text-destructive">
                       {errors.email.message}
                     </p>
                   )}
                 </div>
                 <div className="mb-3">
                   <Label htmlFor="phone">
-                    Phone Number <span className="text-red-400">*</span>
+                    Phone Number <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     placeholder="09 -- -- -- --"
@@ -163,7 +163,7 @@ export default function EditMemberPage() {
                     {...register("phone")}
                   />
                   {errors.phone && (
-                    <p className="my-2 text-xs text-red-400">
+                    <p className="my-2 text-xs text-destructive">
                       {errors.phone.message}
                     </p>
                   )}
@@ -190,7 +190,7 @@ export default function EditMemberPage() {
                       </SelectContent>
                     </Select>
                     {errors.role && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="mt-2 text-xs text-destructive">
                         <p>{errors.role.message}</p>
                       </div>
                     )}

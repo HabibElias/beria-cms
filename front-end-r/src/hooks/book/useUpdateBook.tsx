@@ -1,3 +1,4 @@
+import { queryClient } from "../../main";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import apiClient from "../../services/Apiclient";
@@ -27,14 +28,18 @@ const useUpdateBook = () => {
         for (const key in axiosError.response.data.errors) {
           toast.error(
             axiosError.response.data.errors[key][0] ??
-              "An unknown error occurred"
+              "An unknown error occurred",
           );
         }
       } else if (error.message) {
-        message = error.message;
+        toast.error("We couldn’t update this book. Please try again.");
       } else {
         toast.error(message);
       }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["books"] });
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
     },
   });
 };

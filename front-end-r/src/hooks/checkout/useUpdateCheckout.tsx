@@ -19,10 +19,10 @@ const useUpdateCheckout = () => {
   return useMutation<ResponseUpdateCheckout, AxiosError, { id: number }>({
     mutationFn: ({ id }) => updateCheckout(id),
     onError: (error: any) => {
-      if (error.response.data.message) toast.error(error.response.data.message);
-      else if (error.response.data.errors) {
-        for (const key in error.response.data.errors) {
-          toast.error(error.response.data.errors[key][0]);
+      if (error.response?.data?.message) toast.error(error.response?.data?.message);
+      else if (error.response?.data?.errors) {
+        for (const key in error.response?.data?.errors) {
+          toast.error(error.response?.data?.errors[key][0]);
         }
       } else toast.error("Error Occurred Try again");
     },
@@ -30,6 +30,7 @@ const useUpdateCheckout = () => {
       toast.success("Checkout Renewed successfully!");
     },
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
       queryClient.invalidateQueries({ queryKey: ["checkouts"] });
       queryClient.invalidateQueries({ queryKey: ["books"] });
     },

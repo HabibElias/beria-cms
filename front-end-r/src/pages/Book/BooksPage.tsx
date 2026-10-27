@@ -1,12 +1,19 @@
-import { BookOpen, Grid, List, Plus, Search } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Grid2X2,
+  List,
+  Plus,
+  Search,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import BookCard, { BookSkeleton } from "../../components/BooksPage/BookCard";
 import { columns } from "../../components/BooksPage/column";
 import { DataTable } from "../../components/BooksPage/data-table";
+import { EmptyState, LoadError } from "../../components/empty-state";
 import { PageHeader } from "../../components/page-header";
 import { Button } from "../../components/ui/button";
-import { Card, CardContent } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import {
   Select,
@@ -15,229 +22,204 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import { Skeleton } from "../../components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import useBooks from "../../hooks/book/useBooks";
 import useCategories from "../../hooks/category/useCategories";
 import useDebounce from "../../hooks/useDebounce";
-type ViewMode = "table" | "cards";
+import { useAuth } from "../../provider/AuthProvider";
 
 export default function BooksPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>("cards");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [params] = useSearchParams();
+  const query = params.get("q") ?? "";
+  const [view, setView] = useState("cards");
+  const [search, setSearch] = useState(query);
+  const [category, setCategory] = useState(params.get("category_id") ?? "all");
+  const [status, setStatus] = useState("all");
   const [page, setPage] = useState(1);
-
-  const params = new URLSearchParams(window.location.search);
-  const cat_id = params.get("category_id");
-  const [categoryFilter, setCategoryFilter] = useState(cat_id ? cat_id : "all");
-
-  const { data: categories, isLoading: catIsLoading } = useCategories();
-  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
-  const { data: books, isLoading: booksIsLoading } = useBooks({
-    page,
-    title: debouncedSearchTerm,
-    category: categoryFilter,
-    status: statusFilter,
-  });
-
-  const handleNextPage = () => {
-    if (books?.data)
-      if (books?.data.length > 0) {
-        setPage((prevPage) => prevPage + 1);
-      }
-  };
-
-  const handlePreviousPage = () => {
-    if (page > 1) {
-      setPage((prevPage) => prevPage - 1);
-    }
-  };
-
+  const { user } = useAuth();
+  useEffect(() => {
+    setSearch(query);
+    setPage(1);
+  }, [query]);
+  const { data: categories } = useCategories();
+  const debounced = useDebounce(search, 350);
+  const {
+    data: books,
+    isLoading,
+    isError,
+    refetch,
+  } = useBooks({ page, title: debounced, category, status });
+  const filtered = Boolean(search || category !== "all" || status !== "all");
+  const lastPage = Math.max(1, books?.last_page ?? 1);
   return (
-    <div className="space-y-6">
+    <div className="page">
       <PageHeader
-        title="Book Inventory"
-        description="Manage your church library collection"
+        title="The book collection"
+        description="Good books, shared generously. Find the next chapter."
       >
-        <div className="flex items-center space-x-2">
-          <ToggleGroup
-            type="single"
-            value={viewMode}
-            onValueChange={(value) => value && setViewMode(value as ViewMode)}
-          >
-            <ToggleGroupItem value="table" aria-label="Table view">
-              <List className="h-4 w-4" />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="cards" aria-label="Card view">
-              <Grid className="h-4 w-4" />
-            </ToggleGroupItem>
-          </ToggleGroup>
+        {user?.role === "admin" && (
           <Button asChild>
             <Link to="/books/add">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Book
+              <Plus size={16} />
+              Add a book
             </Link>
           </Button>
-        </div>
+        )}
       </PageHeader>
-
-      <div className="px-4 sm:px-6 lg:px-8">
-        <Card>
-          <CardContent className="p-6">
-            {/* Search and Filters */}
-            <div className="mb-6 flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-              <div className="relative flex-1">
-                <Search className="top-3/5 absolute left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                <Input
-                  placeholder="Search books by title, author, or ISBN..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setPage(1);
-                    setSearchTerm(e.target.value);
-                  }}
-                />
+      <div className="page-content">
+        <div className="collection-toolbar">
+          <div className="collection-search">
+            <Search size={17} aria-hidden="true" />
+            <Input
+              aria-label="Search books by title"
+              placeholder="Search books by title…"
+              value={search}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
+          <Select
+            value={category}
+            onValueChange={(value) => {
+              setCategory(value);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger aria-label="Filter by category">
+              <SelectValue placeholder="All categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All categories</SelectItem>
+              {categories?.map((item) => (
+                <SelectItem key={item.id} value={String(item.id)}>
+                  {item.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={status}
+            onValueChange={(value) => {
+              setStatus(value);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger aria-label="Filter by availability">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All availability</SelectItem>
+              <SelectItem value="available">Available</SelectItem>
+              <SelectItem value="checked-out">On loan</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="collection-summary">
+          <p aria-live="polite">
+            {isLoading
+              ? "Finding your books…"
+              : `${(books?.total ?? 0).toLocaleString()} ${(books?.total ?? 0) === 1 ? "book" : "books"}${filtered ? " found" : " in the collection"}`}
+          </p>
+          <ToggleGroup
+            type="single"
+            value={view}
+            onValueChange={(value) => value && setView(value)}
+            aria-label="Collection view"
+          >
+            <ToggleGroupItem value="cards" aria-label="Card view">
+              <Grid2X2 size={16} />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="table" aria-label="Table view">
+              <List size={16} />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+        {isError ? (
+          <LoadError onRetry={() => void refetch()} />
+        ) : isLoading ? (
+          <div className="book-grid">
+            {Array.from({ length: 6 }, (_, index) => (
+              <BookSkeleton key={index} />
+            ))}
+          </div>
+        ) : books?.data.length ? (
+          <>
+            {view === "cards" ? (
+              <div className="book-grid">
+                {books.data.map((book) => (
+                  <BookCard key={book.id} book={book} />
+                ))}
               </div>
-              <div className="flex items-end space-x-2">
-                {!catIsLoading ? (
-                  <Select
-                    value={categoryFilter}
-                    onValueChange={(value) => {
-                      setPage(1);
-                      setCategoryFilter(value);
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories?.map((cat) => (
-                        <SelectItem key={cat.id} value={String(cat.id)}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <div className="w-35 h-10 rounded-md bg-neutral-800"></div>
-                )}
-                <Select
-                  value={statusFilter}
-                  onValueChange={(value) => {
-                    setPage(1);
-                    setStatusFilter(value);
-                  }}
-                >
-                  <SelectTrigger className="w-full sm:w-32">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="available">Available</SelectItem>
-                    <SelectItem value="checked-out">Checked Out</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {booksIsLoading ? (
-              viewMode === "cards" ? (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {Array.from({ length: 12 }).map((_, index) => (
-                    <BookSkeleton key={index} />
-                  ))}
-                </div>
-              ) : (
-                <div className="w-full">
-                  <div>
-                    <Skeleton className="mb-4 h-10 rounded" />
-                    {Array.from({ length: 8 }).map((_, idx) => (
-                      <Skeleton key={idx} className="mb-2 h-8 rounded" />
-                    ))}
-                  </div>
-                </div>
-              )
             ) : (
-              <>
-                {/* Results count */}
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600">
-                    Showing from {books?.from ?? 0} to {books?.to ?? 0} of{" "}
-                    {books?.total} books
-                  </p>
-                </div>
-
-                {/* Table View */}
-                {viewMode === "table" && (
-                  <DataTable data={books?.data ?? []} columns={columns} />
-                )}
-
-                {/* Card View */}
-                {viewMode === "cards" && (
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                    {books?.data?.map((book) => (
-                      <BookCard book={book} key={book.id} />
-                    ))}
-                  </div>
-                )}
-
-                {/* Empty state */}
-                {books?.data?.length === 0 && (
-                  <div className="py-12 text-center">
-                    <BookOpen className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                    <h3 className="mb-2 text-lg font-medium text-gray-900">
-                      No books found
-                    </h3>
-                    <p className="mb-4 text-gray-500">
-                      {searchTerm ||
-                      categoryFilter !== "all" ||
-                      statusFilter !== "all"
-                        ? "Try adjusting your search or filters"
-                        : "Get started by adding your first book to the library"}
-                    </p>
-                    <Button asChild>
-                      <Link to="/books/add">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Book
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-
-                {/* Pagination controls */}
-                {books?.data && books?.data?.length > 0 && (
-                  <div className="mt-4 flex items-center justify-between">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handlePreviousPage}
-                      disabled={page === 1}
-                    >
-                      Previous
-                    </Button>
-                    <span className="text-sm text-gray-600">
-                      Page {page} of{" "}
-                      {Math.ceil((books?.total ?? 0) / (books?.per_page ?? 1))}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleNextPage}
-                      disabled={
-                        page >=
-                        Math.ceil((books?.total ?? 0) / (books?.per_page ?? 1))
-                      }
-                    >
-                      Next
-                    </Button>
-                  </div>
-                )}
-              </>
+              <DataTable columns={columns} data={books.data} />
             )}
-          </CardContent>
-        </Card>
+            <nav aria-label="Book collection pages" className="pagination">
+              <p>
+                {books.from ?? 0}–{books.to ?? books.data.length} of{" "}
+                {books.total.toLocaleString()} books
+              </p>
+              <div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((value) => value - 1)}
+                  disabled={page <= 1}
+                >
+                  <ArrowLeft size={14} />
+                  Previous
+                </Button>
+                <span>
+                  {page} / {lastPage}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((value) => value + 1)}
+                  disabled={page >= lastPage}
+                >
+                  Next
+                  <ArrowRight size={14} />
+                </Button>
+              </div>
+            </nav>
+          </>
+        ) : (
+          <EmptyState
+            title={
+              filtered
+                ? "No books match just yet"
+                : "Make space for the first story"
+            }
+            description={
+              filtered
+                ? "Try another title or a different category. Your next read may be nearby."
+                : "Add a book to start building a collection your community can share."
+            }
+          >
+            {filtered ? (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearch("");
+                  setCategory("all");
+                  setStatus("all");
+                  setPage(1);
+                }}
+              >
+                Clear filters
+              </Button>
+            ) : user?.role === "admin" ? (
+              <Button asChild>
+                <Link to="/books/add">
+                  <Plus size={16} />
+                  Add the first book
+                </Link>
+              </Button>
+            ) : null}
+          </EmptyState>
+        )}
       </div>
     </div>
   );

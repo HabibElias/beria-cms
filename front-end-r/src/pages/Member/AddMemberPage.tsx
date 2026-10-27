@@ -54,8 +54,8 @@ const AddMemberPage = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Add New Member"
-        description="Add a member to the Family"
+        title="Welcome a new reader"
+        description="A name, a few details, and a place in our community."
       >
         <Button variant="outline" asChild>
           <Link to="/members">
@@ -78,7 +78,7 @@ const AddMemberPage = () => {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-3">
                   <Label htmlFor="name">
-                    Name <span className="text-red-400">*</span>
+                    Name <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     placeholder="Shanko Dolche"
@@ -87,14 +87,14 @@ const AddMemberPage = () => {
                     {...register("name")}
                   />
                   {errors.name && (
-                    <p className="text-red-400 text-xs my-2">
+                    <p className="text-destructive text-xs my-2">
                       {errors.name.message}
                     </p>
                   )}
                 </div>
                 <div className="mb-3">
                   <Label htmlFor="email">
-                    Email <span className="text-red-400">*</span>
+                    Email <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     placeholder="example@gmail.com"
@@ -103,14 +103,14 @@ const AddMemberPage = () => {
                     {...register("email")}
                   />
                   {errors.email && (
-                    <p className="text-red-400 text-xs my-2">
+                    <p className="text-destructive text-xs my-2">
                       {errors.email.message}
                     </p>
                   )}
                 </div>
                 <div className="mb-3">
                   <Label htmlFor="phone">
-                    Phone Number <span className="text-red-400">*</span>
+                    Phone Number <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     placeholder="09 -- -- -- --"
@@ -120,7 +120,7 @@ const AddMemberPage = () => {
                     {...register("phone")}
                   />
                   {errors.phone && (
-                    <p className="text-red-400 text-xs my-2">
+                    <p className="text-destructive text-xs my-2">
                       {errors.phone.message}
                     </p>
                   )}
@@ -147,7 +147,7 @@ const AddMemberPage = () => {
                       </SelectContent>
                     </Select>
                     {errors.role && (
-                      <div className="text-xs mt-2 text-red-400">
+                      <div className="text-xs mt-2 text-destructive">
                         <p>{errors.role.message}</p>
                       </div>
                     )}

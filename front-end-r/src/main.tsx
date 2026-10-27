@@ -1,11 +1,14 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import "@fontsource-variable/nunito";
+import "@fontsource-variable/noto-sans-ethiopic";
 import "./index.css";
 import { ThemeProvider } from "next-themes";
 import { RouterProvider } from "react-router-dom";
 import AuthProvider from "./provider/AuthProvider.tsx";
 import routes from "./routes.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "./components/ui/sonner";
 
 export const queryClient = new QueryClient();
 
@@ -21,7 +24,8 @@ createRoot(document.getElementById("root")!).render(
         <AuthProvider>
           <RouterProvider router={routes} />
         </AuthProvider>
+        <Toaster position="top-right" richColors closeButton />
       </ThemeProvider>
     </QueryClientProvider>
-  </StrictMode>
+  </StrictMode>,
 );

@@ -33,21 +33,26 @@ export function CheckoutForm({
   bookId,
   bookTittle,
   userId,
+  onSuccess,
 }: {
   bookId?: number;
   bookTittle?: string;
   userId?: number;
+  onSuccess?: () => void;
 }) {
   const form = useForm<z.infer<typeof CheckoutSchema>>({
     resolver: zodResolver(CheckoutSchema),
     defaultValues: {
       book_id: bookId ?? undefined,
       user_id: userId ?? undefined,
-      return_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      return_date: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000)
         .toISOString()
         .slice(0, 10),
     },
   });
+
+  const [userPopoverOpen, setUserPopoverOpen] = useState(false);
+  const [bookPopoverOpen, setBookPopoverOpen] = useState(false);
 
   // Hooks for users and books
   const { data: members = [], isLoading: usersLoading } = useMembers();
@@ -70,6 +75,7 @@ export function CheckoutForm({
   const { data: booksData, isLoading: booksLoading } = useBooks({
     page: 1,
     title: debouncedBookSearch,
+    status: "available",
   });
 
   // Client-side search for users
@@ -79,7 +85,7 @@ export function CheckoutForm({
       const results = members.filter(
         (u) =>
           u.name.toLowerCase().includes(term.toLowerCase()) ||
-          u.email.toLowerCase().includes(term.toLowerCase())
+          u.email.toLowerCase().includes(term.toLowerCase()),
       );
       setFilteredUsers(results);
       // If no results, you could trigger a backend search here
@@ -92,12 +98,20 @@ export function CheckoutForm({
   };
 
   async function onSubmit(data: z.infer<typeof CheckoutSchema>) {
-    mutate({ data });
+    mutate(
+      { data },
+      {
+        onSuccess: () => {
+          form.reset();
+          onSuccess?.();
+        },
+      },
+    );
   }
 
   if (booksLoading && usersLoading) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="flex h-full w-full items-center justify-center">
         <Loader2Icon className="animate-spin" />
       </div>
     );
@@ -105,15 +119,15 @@ export function CheckoutForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
         <FormField
           control={form.control}
           disabled={usersLoading}
           name="user_id"
           render={({ field }) => (
-            <FormItem className="flex flex-col w-full">
+            <FormItem className="flex w-full flex-col">
               <FormLabel>User</FormLabel>
-              <Popover>
+              <Popover open={userPopoverOpen} onOpenChange={setUserPopoverOpen}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
@@ -121,7 +135,7 @@ export function CheckoutForm({
                       role="combobox"
                       className={cn(
                         "w-full justify-between",
-                        !field.value && "text-muted-foreground"
+                        !field.value && "text-muted-foreground",
                       )}
                     >
                       {field.value
@@ -148,6 +162,7 @@ export function CheckoutForm({
                             key={user.id}
                             onSelect={() => {
                               form.setValue("user_id", user.id);
+                              setUserPopoverOpen(false);
                             }}
                           >
                             {user.name}
@@ -156,7 +171,7 @@ export function CheckoutForm({
                                 "ml-auto",
                                 user.id === field.value
                                   ? "opacity-100"
-                                  : "opacity-0"
+                                  : "opacity-0",
                               )}
                             />
                           </CommandItem>
@@ -175,9 +190,9 @@ export function CheckoutForm({
           disabled={booksLoading}
           name="book_id"
           render={({ field }) => (
-            <FormItem className="flex flex-col w-full">
+            <FormItem className="flex w-full flex-col">
               <FormLabel>Book</FormLabel>
-              <Popover>
+              <Popover open={bookPopoverOpen} onOpenChange={setBookPopoverOpen}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
@@ -185,12 +200,12 @@ export function CheckoutForm({
                       role="combobox"
                       className={cn(
                         "w-full justify-between",
-                        !field.value && "text-muted-foreground"
+                        !field.value && "text-muted-foreground",
                       )}
                     >
                       {field.value
                         ? booksData?.data?.find(
-                            (book) => book.id === field.value
+                            (book) => book.id === field.value,
                           )?.title
                         : "Select book"}
                       <ChevronsUpDown className="opacity-50" />
@@ -220,12 +235,12 @@ export function CheckoutForm({
                                   .includes(bookSearch.toLowerCase()) ||
                                 b.author
                                   .toLowerCase()
-                                  .includes(bookSearch.toLowerCase())
+                                  .includes(bookSearch.toLowerCase()),
                             );
                           }
                           // Ensure selected book is always present
                           const selectedBook = books.find(
-                            (b) => b.id === field.value
+                            (b) => b.id === field.value,
                           );
                           if (
                             selectedBook &&
@@ -239,6 +254,7 @@ export function CheckoutForm({
                               key={book.id}
                               onSelect={() => {
                                 form.setValue("book_id", book.id);
+                                setBookPopoverOpen(false);
                               }}
                             >
                               {book.title}
@@ -247,7 +263,7 @@ export function CheckoutForm({
                                   "ml-auto",
                                   book.id === field.value
                                     ? "opacity-100"
-                                    : "opacity-0"
+                                    : "opacity-0",
                                 )}
                               />
                             </CommandItem>

@@ -1,7 +1,10 @@
 import type User from "../models/User";
 import apiClient from "../services/Apiclient";
-import { AxiosError, type InternalAxiosRequestConfig } from "axios";
-import { CheckCircle2 } from "lucide-react";
+import {
+  isAxiosError,
+  type AxiosError,
+  type InternalAxiosRequestConfig,
+} from "axios";
 import {
   createContext,
   type ReactNode,
@@ -18,9 +21,10 @@ import { toast } from "sonner";
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthContextType {
+  updateUserProfile: (profile: Pick<User, "name" | "email">) => void;
   logout: () => void;
   fetchState: "notReady" | "ready" | "registering" | "logging" | "applying";
-  login: (email: string, password: string) => void;
+  login: (email: string, password: string) => Promise<void>;
   user?: User;
 }
 
@@ -33,7 +37,34 @@ interface Response {
   status: boolean;
   token?: string;
   message?: string;
-  user: User;
+  user?: User;
+  error?: string;
+  errors?: Record<string, string[]>;
+}
+
+function loginErrorMessage(error: unknown): string {
+  if (!isAxiosError<Response>(error))
+    return "Sign-in failed. Please try again.";
+  if (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT") {
+    return "Sign-in timed out. Please try again.";
+  }
+  if (!error.response) return "Unable to reach the server. Please try again.";
+  if (error.response.status === 429)
+    return "Too many sign-in attempts. Please wait and try again.";
+  if (error.response.status >= 500)
+    return "The server is unavailable. Please try again shortly.";
+
+  const data = error.response.data;
+  const validationError = Object.values(data?.errors ?? {})
+    .flat()
+    .find((value) => typeof value === "string");
+  if (validationError) return validationError;
+  if (typeof data?.message === "string" && data.message) return data.message;
+  if (typeof data?.error === "string" && data.error) return data.error;
+  if (error.response.status === 401) return "Incorrect email or password.";
+  if (error.response.status === 403)
+    return "You do not have permission to sign in.";
+  return "Sign-in failed. Please try again.";
 }
 
 export const useAuth = () => {
@@ -45,6 +76,7 @@ export const useAuth = () => {
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [mounted, setMounted] = useState(false);
   const ref = useRef<boolean | null>(null);
+  const loginInFlight = useRef(false);
 
   const [fetchState, setFetchState] = useState<
     "notReady" | "logging" | "ready" | "registering" | "applying"
@@ -53,9 +85,8 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(() => {
     const savedToken = localStorage.getItem("auth_token");
     if (savedToken) {
-      apiClient.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${savedToken}`;
+      apiClient.defaults.headers.common["Authorization"] =
+        `Bearer ${savedToken}`;
     } else {
       delete apiClient.defaults.headers.common["Authorization"];
     }
@@ -64,34 +95,59 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const [user, setUser] = useState<User>();
 
-  const login = useCallback(async (email: string, password: string) => {
-    setFetchState("logging");
-    try {
-      const response = await apiClient.post<Response>("/login", {
-        email,
-        password,
-      });
-      if (response.data.status) {
-        const token = response.data.token ?? "";
-        setToken(token);
-        localStorage.setItem("auth_token", token);
-        apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        setUser(response.data.user);
-        toast("Log In Successfully", {
-          icon: <CheckCircle2 />,
-          style: { display: "flex", alignItems: "center", gap: "1rem" },
-        });
-      } else {
-        toast.error(response.data.message || "Login failed");
-      }
-    } catch (e) {
-      console.error(e);
-      setToken(null);
-      // localStorage.removeItem("auth_token");
-    } finally {
-      setFetchState("ready");
-    }
+  const clearSession = useCallback(() => {
+    setToken(null);
+    setUser(undefined);
+    localStorage.removeItem("auth_token");
+    delete apiClient.defaults.headers.common["Authorization"];
   }, []);
+
+  const login = useCallback(
+    async (email: string, password: string) => {
+      if (loginInFlight.current) return;
+      loginInFlight.current = true;
+      setFetchState("logging");
+      const toastId = toast.loading("Signing in…");
+      try {
+        const response = await apiClient.post<Response>(
+          "/login",
+          {
+            email,
+            password,
+          },
+          { timeout: 60_000 },
+        );
+        if (
+          response.data?.status === true &&
+          response.data.token &&
+          response.data.user
+        ) {
+          const token = response.data.token;
+          setToken(token);
+          localStorage.setItem("auth_token", token);
+          apiClient.defaults.headers.common["Authorization"] =
+            `Bearer ${token}`;
+          setUser(response.data.user);
+          toast.success("Signed in successfully.", { id: toastId });
+        } else {
+          clearSession();
+          toast.error(
+            response.data?.message ||
+              response.data?.error ||
+              "The server returned an unexpected sign-in response. Please try again.",
+            { id: toastId },
+          );
+        }
+      } catch (error) {
+        clearSession();
+        toast.error(loginErrorMessage(error), { id: toastId });
+      } finally {
+        loginInFlight.current = false;
+        setFetchState("ready");
+      }
+    },
+    [clearSession],
+  );
 
   const logout = useCallback(async () => {
     try {
@@ -99,32 +155,45 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (err) {
       console.error(err);
     } finally {
-      setUser(undefined);
-      setToken(null);
-      localStorage.removeItem("auth_token");
-      delete apiClient.defaults.headers.common["Authorization"];
+      clearSession();
       window.location.href = "/login";
     }
-  }, []);
+  }, [clearSession]);
 
   useLayoutEffect(() => {
     if (!mounted && !ref.current) {
+      if (!localStorage.getItem("auth_token")) {
+        ref.current = true;
+        setMounted(true);
+        setFetchState("ready");
+        return;
+      }
       const fetchMe = async () => {
         setFetchState("notReady");
         try {
-          const response = await apiClient.post<Response>("/refresh");
-          if (response.data.status && response.data.token) {
+          const response = await apiClient.post<Response>(
+            "/refresh",
+            undefined,
+            { timeout: 60_000 },
+          );
+          if (
+            response.data.status &&
+            response.data.token &&
+            response.data.user
+          ) {
             setToken(response.data.token);
             localStorage.setItem("auth_token", response.data.token);
-            apiClient.defaults.headers.common[
-              "Authorization"
-            ] = `Bearer ${response.data.token}`;
+            apiClient.defaults.headers.common["Authorization"] =
+              `Bearer ${response.data.token}`;
             setUser(response.data.user);
+          } else {
+            clearSession();
           }
-        } catch (err) {
-          console.error("Token refresh failed", err);
-          setToken(null);
-        //   localStorage.removeItem("auth_token");
+        } catch {
+          clearSession();
+          toast.error(
+            "We couldn't restore your session. Please sign in again.",
+          );
         } finally {
           setFetchState("ready");
         }
@@ -133,7 +202,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       setMounted(true);
       ref.current = true;
     }
-  }, [mounted]);
+  }, [mounted, clearSession]);
 
   // ✅ Attach token to every Axios request
   useLayoutEffect(() => {
@@ -144,56 +213,73 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
         config.withCredentials = true;
         return config;
-      }
+      },
     );
     return () => {
       apiClient.interceptors.request.eject(authInterceptor);
     };
   }, [token]);
 
-  // ✅ Handle token refresh on 403 errors
+  // Refresh expired sessions, while allowing auth responses and permission errors through.
   useEffect(() => {
     let isRefreshing = false;
     const refreshInterceptor = apiClient.interceptors.response.use(
       (response) => response,
       async (error: AxiosError) => {
         const originalRequest = error.config as ExtendedAxiosRequestConfig;
+        const isAuthRequest = /\/(login|refresh|logout)(?:\?|$)/.test(
+          originalRequest?.url ?? "",
+        );
         if (
-          error.response?.status === 403 &&
+          error.response?.status === 401 &&
+          originalRequest &&
+          !isAuthRequest &&
+          localStorage.getItem("auth_token") &&
           !originalRequest._retry &&
           !isRefreshing
         ) {
           isRefreshing = true;
           originalRequest._retry = true;
           try {
-            const response = await apiClient.post<Response>("/refresh");
+            const response = await apiClient.post<Response>(
+              "/refresh",
+              undefined,
+              { timeout: 60_000 },
+            );
             if (response.data.token) {
               setToken(response.data.token);
               localStorage.setItem("auth_token", response.data.token);
-              apiClient.defaults.headers.common[
-                "Authorization"
-              ] = `Bearer ${response.data.token}`;
+              apiClient.defaults.headers.common["Authorization"] =
+                `Bearer ${response.data.token}`;
               originalRequest.headers.Authorization = `Bearer ${response.data.token}`;
-              isRefreshing = false;
               return apiClient(originalRequest);
             }
-          } catch (refreshError) {
-            console.error(
-              "Token refresh failed during interceptor",
-              refreshError
-            );
-            setToken(null);
-            localStorage.removeItem("auth_token");
+            throw new Error("Session refresh failed");
+          } catch {
+            clearSession();
+            toast.error("Your session has expired. Please sign in again.");
+          } finally {
             isRefreshing = false;
           }
         }
         return Promise.reject(error);
-      }
+      },
     );
     return () => {
       apiClient.interceptors.response.eject(refreshInterceptor);
     };
-  }, []);
+  }, [clearSession]);
+
+  const updateUserProfile = useCallback(
+    (profile: Pick<User, "name" | "email">) => {
+      setUser((current) =>
+        current
+          ? { ...current, name: profile.name, email: profile.email }
+          : current,
+      );
+    },
+    [],
+  );
 
   const contextValue = useMemo(
     () => ({
@@ -201,8 +287,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       login,
       user,
       fetchState,
+      updateUserProfile,
     }),
-    [logout, login, user, fetchState]
+    [logout, login, user, fetchState, updateUserProfile],
   );
 
   return (

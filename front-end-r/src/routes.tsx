@@ -15,6 +15,7 @@ import AddMemberPage from "./pages/Member/AddMemberPage";
 import MembersPage from "./pages/Member/MembersPage";
 import CategoriesPage from "./pages/categories/CategoriesPage";
 import ProfilePage from "./pages/ProfilePage";
+import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
 import EditMemberPage from "./pages/Member/EditMemberPage";
 
@@ -67,6 +68,10 @@ const routes = createBrowserRouter([
           {
             path: "/categories",
             element: <CategoriesPage />,
+          },
+          {
+            path: "/reports",
+            element: <ReportsPage />,
           },
           {
             path: "/profile",

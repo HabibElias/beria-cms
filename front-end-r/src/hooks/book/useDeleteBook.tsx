@@ -2,7 +2,6 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryClient } from "../../main";
 import apiClient from "../../services/Apiclient";
-import { supabase } from "../../config/supabase";
 import type Book from "../../models/Book";
 
 interface DeleteResponse {
@@ -12,12 +11,7 @@ interface DeleteResponse {
 
 const useDeleteBook = () => {
   return useMutation<DeleteResponse, Error, { id: number; path: string }>({
-    mutationFn: async ({ id, path }) => {
-      if (path)
-        await supabase.storage
-          .from(import.meta.env.VITE_SUPABASE_BUCKET)
-          .remove([path]);
-
+    mutationFn: async ({ id }) => {
       const response = await apiClient.delete<DeleteResponse>(`/books/${id}`);
       return response.data;
     },
@@ -45,10 +39,10 @@ const useDeleteBook = () => {
     onError: (error: any, _variables, context) => {
       console.error(error);
 
-      if (error.response.data.message) toast.error(error.response.data.message);
-      else if (error.response.data.errors) {
-        for (const key in error.response.data.errors) {
-          toast.error(error.response.data.errors[key][0]);
+      if (error.response?.data?.message) toast.error(error.response?.data?.message);
+      else if (error.response?.data?.errors) {
+        for (const key in error.response?.data?.errors) {
+          toast.error(error.response?.data?.errors[key][0]);
         }
       } else toast.error("Error Occurred Try again");
       if (
@@ -65,6 +59,7 @@ const useDeleteBook = () => {
       toast.success("Book deleted successfully!");
     },
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
       queryClient.invalidateQueries({ queryKey: ["books"] });
     },
   });

@@ -27,7 +27,7 @@ import useAddBooks from "../../hooks/book/useAddBooks";
 import useCategories from "../../hooks/category/useCategories";
 import { Skeleton } from "../../components/ui/skeleton";
 import { useState } from "react";
-import { supabase } from "../../config/supabase";
+import { uploadBookImage } from "../../services/bookImages";
 import CategoryAddDialog from "../../components/category/category-add-dialog";
 
 type FormData = z.infer<typeof BookSchema>;
@@ -73,32 +73,19 @@ export default function AddBookPage() {
     }
   };
   const onSubmit = async (data: FormData) => {
+    if (isPending || storeIsPending) return;
     if (bookImgFile) {
       setIsPending(true);
-      const filePath = `books/${Date.now()}_${bookImgFile.name}`;
-      const { data: supabaseData, error } = await supabase.storage
-        .from(import.meta.env.VITE_SUPABASE_BUCKET)
-        .upload(filePath, bookImgFile);
-
-      if (error) {
-        toast.error("Failed to upload image.");
-        setIsPending(false);
+      try {
+        const image = await uploadBookImage(bookImgFile);
+        data.book_img = image.book_img;
+        data.book_path = image.book_path;
+      } catch {
+        toast.error("Failed to upload image. Please try again.");
         return;
-      }
-
-      const { data: imgUrlData } = supabase.storage
-        .from(import.meta.env.VITE_SUPABASE_BUCKET)
-        .getPublicUrl(supabaseData.path);
-
-      if (!imgUrlData) {
-        toast.error("Failed to get image.");
+      } finally {
         setIsPending(false);
-        return;
       }
-
-      data.book_img = imgUrlData?.publicUrl;
-      data.book_path = supabaseData?.path;
-      setIsPending(false);
     }
 
     mutate(data, {
@@ -114,8 +101,8 @@ export default function AddBookPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Add New Book"
-        description="Add a new book to your berea-cms collection"
+        title="Add a book"
+        description="A new story for the shelves. Add its details below."
       >
         <Button variant="outline" asChild>
           <Link to="/books">
@@ -137,14 +124,14 @@ export default function AddBookPage() {
                   <Label htmlFor="book-img">Book Image</Label>
                   <Input
                     type="file"
-                    accept="image/*,application/pdf"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     onChange={handleFileChange}
                     name="book-img"
                     id="book-img"
                   />
                   {bookImg && (
                     <div className="mt-2">
-                      <span className="text-gray-500">Image Preview:</span>
+                      <span className="text-muted-foreground">Image Preview:</span>
                       <img
                         src={bookImg}
                         alt="book-img Preview"
@@ -156,7 +143,7 @@ export default function AddBookPage() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="title">
-                      Title <span className="text-red-400">*</span>
+                      Title <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="title"
@@ -164,14 +151,14 @@ export default function AddBookPage() {
                       {...register("title")}
                     />
                     {errors.title && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="mt-2 text-xs text-destructive">
                         <p>{errors.title.message}</p>
                       </div>
                     )}
                   </div>
                   <div>
                     <Label htmlFor="author">
-                      Author <span className="text-red-400">*</span>
+                      Author <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="author"
@@ -179,7 +166,7 @@ export default function AddBookPage() {
                       {...register("author")}
                     />
                     {errors.author && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="mt-2 text-xs text-destructive">
                         <p>{errors.author.message}</p>
                       </div>
                     )}
@@ -195,14 +182,14 @@ export default function AddBookPage() {
                       {...register("publisher")}
                     />
                     {errors.publisher && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="mt-2 text-xs text-destructive">
                         <p>{errors.publisher.message}</p>
                       </div>
                     )}
                   </div>
                   <div>
                     <Label htmlFor="publication-year">
-                      Publication Year <span className="text-red-400">*</span>
+                      Publication Year <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="publication-year"
@@ -211,14 +198,14 @@ export default function AddBookPage() {
                       {...register("published_year")}
                     />
                     {errors.published_year && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="mt-2 text-xs text-destructive">
                         <p>{errors.published_year.message}</p>
                       </div>
                     )}
                   </div>
                   <div>
                     <Label htmlFor="pages">
-                      Pages <span className="text-red-400">*</span>
+                      Pages <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="pages"
@@ -227,7 +214,7 @@ export default function AddBookPage() {
                       {...register("pages")}
                     />
                     {errors.pages && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="mt-2 text-xs text-destructive">
                         <p>{errors.pages.message}</p>
                       </div>
                     )}
@@ -237,7 +224,7 @@ export default function AddBookPage() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="location">
-                      Shelf Location <span className="text-red-400">*</span>
+                      Shelf Location <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="location"
@@ -245,14 +232,14 @@ export default function AddBookPage() {
                       {...register("location")}
                     />
                     {errors.location && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="mt-2 text-xs text-destructive">
                         <p>{errors.location.message}</p>
                       </div>
                     )}
                   </div>
                   <div>
                     <Label htmlFor="condition">
-                      Condition <span className="text-red-400">*</span>
+                      Condition <span className="text-destructive">*</span>
                     </Label>
                     <Select
                       value={condition}
@@ -273,14 +260,14 @@ export default function AddBookPage() {
                       </SelectContent>
                     </Select>
                     {errors.condition && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="mt-2 text-xs text-destructive">
                         <p>{errors.condition.message}</p>
                       </div>
                     )}
                   </div>
                   <div>
                     <Label htmlFor="category">
-                      Category <span className="text-red-400">*</span>
+                      Category <span className="text-destructive">*</span>
                     </Label>
                     {!catIsLoading ? (
                       categories?.length == 0 ? (
@@ -318,7 +305,7 @@ export default function AddBookPage() {
                       <Skeleton className="h-10 w-1/2 rounded-md" />
                     )}
                     {errors.category_id && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="mt-2 text-xs text-destructive">
                         <p>{errors.category_id.message}</p>
                       </div>
                     )}
@@ -327,16 +314,16 @@ export default function AddBookPage() {
 
                 <div>
                   <Label htmlFor="description">
-                    Description <span className="text-red-400">*</span>
+                    Description <span className="text-destructive">*</span>
                   </Label>
                   <Textarea
                     id="description"
-                    placeholder="Brief description of the book (optional)"
+                    placeholder="A few words to help the next reader."
                     rows={3}
                     {...register("description")}
                   />
                   {errors.description && (
-                    <div className="mt-2 text-xs text-red-400">
+                    <div className="mt-2 text-xs text-destructive">
                       <p>{errors.description.message}</p>
                     </div>
                   )}
@@ -351,7 +338,7 @@ export default function AddBookPage() {
                     {...register("notes")}
                   />
                   {errors.notes && (
-                    <div className="mt-2 text-xs text-red-400">
+                    <div className="mt-2 text-xs text-destructive">
                       <p>{errors.notes.message}</p>
                     </div>
                   )}
@@ -361,7 +348,7 @@ export default function AddBookPage() {
                   <Button variant="outline" asChild>
                     <Link to="/books">Cancel</Link>
                   </Button>
-                  <Button type="submit" disabled={isPending}>
+                  <Button type="submit" disabled={isPending || storeIsPending}>
                     {isPending || storeIsPending ? (
                       <Loader2Icon className="animate-spin" />
                     ) : (

@@ -1,18 +1,11 @@
-import {
-  Edit,
-  Loader2Icon,
-  Mail,
-  Phone,
-  Plus,
-  Search,
-  Trash2,
-} from "lucide-react";
+import { Edit, Loader2, Plus, Search, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { EmptyState, LoadError } from "../../components/empty-state";
 import { PageHeader } from "../../components/page-header";
-import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
-import { Card, CardContent } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
+import { Skeleton } from "../../components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -21,212 +14,317 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
-import useMembers from "../../hooks/members/useMembers";
-import { useAuth } from "../../provider/AuthProvider";
-import { Skeleton } from "../../components/ui/skeleton";
-import { useState } from "react";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
-  DialogTitle,
   DialogDescription,
-  DialogClose,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "../../components/ui/dialog";
-import { DialogHeader, DialogFooter } from "../../components/ui/dialog";
+import useMembers from "../../hooks/members/useMembers";
 import useDeleteMember from "../../hooks/members/useDeleteMembers";
+import { useCompactLayout } from "../../hooks/useCompactLayout";
+import type Member from "../../models/Member";
+import { useAuth } from "../../provider/AuthProvider";
 
 export default function MembersPage() {
-  const { data: members, isLoading } = useMembers();
+  const { data: members = [], isLoading, isError, refetch } = useMembers();
   const { user } = useAuth();
-  const [open, setOpen] = useState<boolean>(false);
-  const { mutate, isPending } = useDeleteMember();
-
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<Member | null>(null);
+  const deletion = useDeleteMember();
+  const compact = useCompactLayout();
+  const filtered = members.filter((member) =>
+    `${member.name} ${member.email} ${member.phone}`
+      .toLowerCase()
+      .includes(search.toLowerCase()),
+  );
   return (
-    <div className="space-y-6">
+    <div className="page">
       <PageHeader
-        title="Library Members"
-        description="Manage your berea-cms members"
+        title="Our library members"
+        description="The people behind every well-read book."
       >
         <Button asChild>
           <Link to="/members/add">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Member
+            <Plus size={16} />
+            Add a member
           </Link>
         </Button>
       </PageHeader>
-
-      <div className="px-4 sm:px-6 lg:px-8">
-        <Card>
-          <CardContent className="p-6">
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row">
-              <div className="relative flex-1">
-                <Search className="absolute top-3/5 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                <Input
-                  placeholder="Search members by name or email..."
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <div className="overflow-x-auto rounded-md border">
-              {isLoading ? (
-                <div className="w-full">
-                  <div>
-                    <Skeleton className="mb-4 h-10 rounded" />
-                    {Array.from({ length: 8 }).map((_, idx) => (
-                      <Skeleton key={idx} className="mb-2 h-8 rounded" />
-                    ))}
+      <div className="page-content">
+        <div className="collection-toolbar">
+          <div className="collection-search">
+            <Search size={17} />
+            <Input
+              aria-label="Search members"
+              placeholder="Find a name, email, or phone number…"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </div>
+        </div>
+        <div className="collection-summary">
+          <p aria-live="polite">
+            {isLoading
+              ? "Finding your readers…"
+              : `${filtered.length} ${filtered.length === 1 ? "member" : "members"}${search ? " found" : " on this page"}`}
+          </p>
+        </div>
+        {isError ? (
+          <LoadError onRetry={() => void refetch()} />
+        ) : isLoading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 5 }, (_, i) => (
+              <Skeleton key={i} className="h-14 w-full" />
+            ))}
+          </div>
+        ) : filtered.length ? (
+          compact ? (
+            <div className="member-list">
+              {filtered.map((member) => (
+                <article className="member-card" key={member.id}>
+                  <div className="member-name">
+                    <span className="user-initials" aria-hidden="true">
+                      {member.name
+                        .split(/\s+/)
+                        .map((word) => word[0])
+                        .slice(0, 2)
+                        .join("")}
+                    </span>
+                    <div className="min-w-0">
+                      <h2 className="font-bold">{member.name}</h2>
+                      <p className="text-muted-foreground text-sm">
+                        {member.email}
+                      </p>
+                      {member.phone && (
+                        <p className="text-muted-foreground text-sm">
+                          {member.phone}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <Table className="overflow-hidden">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Contact
-                      </TableHead>
-                      <TableHead className="hidden sm:table-cell">
-                        Member Since
-                      </TableHead>
-                      <TableHead>Books Out</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {members &&
-                      members.map((member) => (
-                        <TableRow key={member.id}>
-                          <TableCell className="font-medium">
-                            <div>
-                              <div className="font-medium">{member.name}</div>
-                              <div className="text-sm text-gray-500 md:hidden">
-                                <div className="flex items-center">
-                                  <Mail className="mr-1 h-3 w-3" />
-                                  {member.email}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            <div className="space-y-1">
-                              <div className="flex items-center text-sm">
-                                <Mail className="mr-1 h-3 w-3" />
-                                {member.email}
-                              </div>
-                              <div className="flex items-center text-sm text-gray-500">
-                                <Phone className="mr-1 h-3 w-3" />
-                                {member.phone}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            {new Date(member.created_at).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
-                              {member.checkouts.length}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {member.role[0].toUpperCase() +
-                              member.role.slice(1)}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              {user?.id === member.id ? (
-                                <Button
-                                  asChild
-                                  variant="ghost"
-                                  size="icon"
-                                  title="Edit your profile"
-                                >
-                                  <Link to="/settings">
-                                    <Edit />
-                                  </Link>
-                                </Button>
-                              ) : (
-                                <Button
-                                  asChild
-                                  variant="ghost"
-                                  size="icon"
-                                  title="Edit member"
-                                >
-                                  <Link
-                                    to={`/members/${member.id}/edit`}
-                                    state={{ member }}
-                                  >
-                                    <Edit />
-                                  </Link>
-                                </Button>
-                              )}
-                              {user?.id !== member.id && (
-                                <Dialog open={open} onOpenChange={setOpen}>
-                                  <DialogTrigger asChild>
-                                    <Button
-                                      className="w-fit justify-start"
-                                      variant="ghost"
-                                      onClick={() => setOpen(true)}
-                                      title="Delete book"
-                                    >
-                                      <Trash2 className="h-3 w-3" />
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent className="w-fit font-[poppins]">
-                                    <DialogHeader>
-                                      <DialogTitle>
-                                        Are you absolutely sure?
-                                      </DialogTitle>
-                                      <DialogDescription>
-                                        This action cannot be undone. This will
-                                        permanently delete member data from our
-                                        servers.
-                                      </DialogDescription>
-                                    </DialogHeader>
-                                    <DialogFooter>
-                                      <DialogClose
-                                        onClick={() => {
-                                          setOpen(false);
-                                        }}
-                                        asChild
-                                      >
-                                        <Button
-                                          variant={"ghost"}
-                                          disabled={isPending}
-                                        >
-                                          Cancel
-                                        </Button>
-                                      </DialogClose>
-                                      <Button
-                                        variant={"destructive"}
-                                        disabled={isPending}
-                                        onClick={() => {
-                                          mutate({ id: member.id });
-                                          setOpen(false);
-                                        }}
-                                      >
-                                        {isPending ? (
-                                          <Loader2Icon className="animate-spin" />
-                                        ) : (
-                                          "Continue"
-                                        )}
-                                      </Button>
-                                    </DialogFooter>
-                                  </DialogContent>
-                                </Dialog>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              )}
+                  <div className="mt-5 flex items-center justify-between gap-3 text-sm">
+                    <p>
+                      <strong className="tabular-nums">
+                        {member.checkouts?.length ?? 0}
+                      </strong>{" "}
+                      books out
+                    </p>
+                    <span className="status-label">
+                      {member.role === "admin"
+                        ? "Admin"
+                        : member.role === "user"
+                          ? "Member"
+                          : "Librarian"}
+                      {user?.id === member.id ? " · You" : ""}
+                    </span>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2 border-t pt-4">
+                    {user?.id === member.id ? (
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to="/settings">
+                          <Edit size={14} />
+                          Edit profile
+                        </Link>
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          aria-label={`Edit ${member.name}`}
+                        >
+                          <Link to={`/members/${member.id}/edit`}>
+                            <Edit size={14} />
+                            Edit member
+                          </Link>
+                        </Button>
+                        {user?.role === "admin" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            aria-label={`Delete ${member.name}`}
+                            onClick={() => setSelected(member)}
+                          >
+                            <Trash2 size={14} />
+                            Delete
+                          </Button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </article>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          ) : (
+            <div className="table-frame">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Member</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Contact
+                    </TableHead>
+                    <TableHead className="hidden xl:table-cell">
+                      Member since
+                    </TableHead>
+                    <TableHead className="text-right">Books out</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((member) => (
+                    <TableRow key={member.id}>
+                      <TableCell>
+                        <div className="member-name">
+                          <span className="user-initials" aria-hidden="true">
+                            {member.name
+                              .split(/\s+/)
+                              .map((word) => word[0])
+                              .slice(0, 2)
+                              .join("")}
+                          </span>
+                          <div>
+                            <strong>{member.name}</strong>
+                            <small className="md:hidden">{member.email}</small>
+                            {user?.id === member.id && <small>You</small>}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <p className="text-sm">{member.email}</p>
+                        <p className="text-muted-foreground mt-1 text-xs">
+                          {member.phone || "—"}
+                        </p>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground hidden xl:table-cell">
+                        {new Date(member.created_at).toLocaleDateString(
+                          undefined,
+                          { month: "short", day: "numeric", year: "numeric" },
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right font-semibold tabular-nums">
+                        {member.checkouts?.length ?? 0}
+                      </TableCell>
+                      <TableCell>
+                        <span className="status-label">
+                          {member.role === "admin"
+                            ? "Admin"
+                            : member.role === "user"
+                              ? "Member"
+                              : "Librarian"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-end gap-1">
+                          {user?.id === member.id ? (
+                            <Button variant="ghost" size="sm" asChild>
+                              <Link to="/settings">Edit profile</Link>
+                            </Button>
+                          ) : (
+                            <>
+                              <Button
+                                asChild
+                                variant="ghost"
+                                size="icon"
+                                className="size-8"
+                                aria-label={`Edit ${member.name}`}
+                                title={`Edit ${member.name}`}
+                              >
+                                <Link to={`/members/${member.id}/edit`}>
+                                  <Edit size={15} />
+                                </Link>
+                              </Button>
+                              {user?.role === "admin" && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="size-8"
+                                  aria-label={`Delete ${member.name}`}
+                                  title={`Delete ${member.name}`}
+                                  onClick={() => setSelected(member)}
+                                >
+                                  <Trash2 size={15} />
+                                </Button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )
+        ) : (
+          <EmptyState
+            title={
+              search ? "No reader by that name" : "A library is a community"
+            }
+            description={
+              search
+                ? "Try another name, email address, or phone number."
+                : "Welcome your first member so they can start borrowing."
+            }
+          >
+            {search ? (
+              <Button variant="outline" onClick={() => setSearch("")}>
+                Clear search
+              </Button>
+            ) : (
+              <Button asChild>
+                <Link to="/members/add">Add the first member</Link>
+              </Button>
+            )}
+          </EmptyState>
+        )}
+        <Dialog
+          open={!!selected}
+          onOpenChange={(open) => {
+            if (!open && !deletion.isPending) setSelected(null);
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Remove {selected?.name}?</DialogTitle>
+              <DialogDescription>
+                This permanently removes this member’s account. Their checkout
+                records may also be removed. This cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                disabled={deletion.isPending}
+                onClick={() => setSelected(null)}
+              >
+                Keep member
+              </Button>
+              <Button
+                variant="destructive"
+                disabled={deletion.isPending}
+                onClick={() =>
+                  selected &&
+                  deletion.mutate(
+                    { id: selected.id },
+                    { onSuccess: () => setSelected(null) },
+                  )
+                }
+              >
+                {deletion.isPending ? (
+                  <Loader2 className="animate-spin" size={16} />
+                ) : (
+                  "Delete member"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

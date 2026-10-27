@@ -55,6 +55,7 @@ const useDeleteMember = () => {
       toast.success("Member deleted successfully!");
     },
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
       queryClient.invalidateQueries({ queryKey: ["members"] });
     },
   });
