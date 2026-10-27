@@ -8,7 +8,7 @@ web
 
 ## Users
 
-Berea church library administrators and librarians manage the collection, members, loans and returns. The existing application also stores ordinary member accounts. The precise frequency of use is not specified; the design supports recurring administrative work on desktop and mobile.
+Berea church library administrators manage the collection, members, loans, returns and loan requests. Anonymous visitors browse the catalogue; registered members request loans and track their own requests and current loans. Only the admin role has management access. Existing librarian-role accounts use the reader experience alongside ordinary members. The precise frequency of use is not specified; the design supports recurring work on desktop and mobile.
 
 ## Product Purpose
 
@@ -16,11 +16,11 @@ Help the Berea church community in Addis Ababa care for a shared library: keep b
 
 ## Operating Context
 
-This is an existing React/TypeScript library application. The frontend is hosted on Vercel and connects to the separate Laravel API at https://beria-cms-back.onrender.com/api. The user manages Render and the Turso database. This redesign updates the existing library application; a public church website is outside the scope. The user confirmed a full redesign of the library app.
+This is an existing React/TypeScript library application. The frontend is hosted on Vercel and connects to the separate Laravel API at https://beria-cms-back.onrender.com/api. The user manages Render and the Turso database. The user requested an integrated public reader experience and account creation, while keeping the existing management application as the admin side. The public catalogue is at /books (and /), member activity at /my-loans, and management at /admin. A public church marketing website remains outside the scope.
 
 ## Capabilities and Constraints
 
-Preserve authenticated login and logout, response toasts, book search and filtering, book details and editing, member management, categories, checkout and return flows, profile and password changes, and theme selection. Reports expose current API totals and this month's recorded returns, with a CSV summary export; historical trends are unavailable. Keep working routes and API contracts. Dashboard and report information comes from the API; do not add invented trends, statistics, congregation photographs or testimonials. The current backend has no functional email password-recovery route; account help must not promise an email was sent.
+Preserve authenticated login and logout, response toasts, book search and filtering, book details and editing, member management, categories, checkout and return flows, profile and password changes, and theme selection. Public registration always creates a member, with a 12–72 character password and confirmation; it cannot assign an admin role. Public book responses omit private inventory notes. Readers see only their own loans and requests, can cancel pending requests, and can have up to three current loans and pending requests when submitting a new request. Admin approval issues a real checkout with a due date in one transaction; declining leaves the book available. Requests do not reserve a copy. The public login does not advertise administrator demo credentials. Reports expose current API totals and this month's recorded returns, with a CSV summary export; historical trends are unavailable. Keep working routes and API contracts. Dashboard and report information comes from the API; do not add invented trends, statistics, congregation photographs or testimonials. The current backend has no functional email password-recovery route; account help must not promise an email was sent.
 
 ## Brand Commitments
 

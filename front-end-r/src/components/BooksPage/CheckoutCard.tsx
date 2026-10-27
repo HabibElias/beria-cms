@@ -16,7 +16,7 @@ export default function CheckoutCard({ checkout }: { checkout: Checkout }) {
       <div className="flex items-start gap-4">
         <BookCover book={checkout.book} small />
         <div className="min-w-0">
-          <Link to={`/books/${checkout.book.id}`} className="font-bold">
+          <Link to={`/admin/books/${checkout.book.id}`} className="font-bold">
             {checkout.book.title}
           </Link>
           <p className="text-muted-foreground mt-1 text-xs">

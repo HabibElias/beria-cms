@@ -25,7 +25,7 @@ export default function CheckoutRow({
       <TableCell>
         <Link
           className="hover:text-primary font-bold"
-          to={`/books/${checkout.book.id}`}
+          to={`/admin/books/${checkout.book.id}`}
         >
           {checkout.book.title}
         </Link>

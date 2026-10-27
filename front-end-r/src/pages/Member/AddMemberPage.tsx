@@ -11,7 +11,10 @@ import {
 } from "../../components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import MemberSchema, { type MemberFormData } from "../../models/MemberSchema";
+import {
+  CreateMemberSchema,
+  type CreateMemberFormData,
+} from "../../models/MemberSchema";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { useAuth } from "../../provider/AuthProvider";
@@ -33,7 +36,7 @@ const AddMemberPage = () => {
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(MemberSchema),
+    resolver: zodResolver(CreateMemberSchema),
     defaultValues: { role: "user" },
   });
 
@@ -42,7 +45,7 @@ const AddMemberPage = () => {
 
   const { mutate, isPending } = useAddMember();
 
-  const onSubmit = (data: MemberFormData) => {
+  const onSubmit = (data: CreateMemberFormData) => {
     mutate(data, {
       onSuccess: () => {
         reset();
@@ -58,15 +61,15 @@ const AddMemberPage = () => {
         description="A name, a few details, and a place in our community."
       >
         <Button variant="outline" asChild>
-          <Link to="/members">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+          <Link to="/admin/members">
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Members
           </Link>
         </Button>
       </PageHeader>
 
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
+        <div className="mx-auto max-w-3xl">
           <Card className="">
             <CardHeader>
               <CardTitle>Member Info</CardTitle>
@@ -87,7 +90,7 @@ const AddMemberPage = () => {
                     {...register("name")}
                   />
                   {errors.name && (
-                    <p className="text-destructive text-xs my-2">
+                    <p className="text-destructive my-2 text-xs">
                       {errors.name.message}
                     </p>
                   )}
@@ -103,7 +106,7 @@ const AddMemberPage = () => {
                     {...register("email")}
                   />
                   {errors.email && (
-                    <p className="text-destructive text-xs my-2">
+                    <p className="text-destructive my-2 text-xs">
                       {errors.email.message}
                     </p>
                   )}
@@ -120,10 +123,44 @@ const AddMemberPage = () => {
                     {...register("phone")}
                   />
                   {errors.phone && (
-                    <p className="text-destructive text-xs my-2">
+                    <p className="text-destructive my-2 text-xs">
                       {errors.phone.message}
                     </p>
                   )}
+                </div>
+                <div className="my-5 space-y-4">
+                  <div className="field">
+                    <Label htmlFor="member-password">Temporary password</Label>
+                    <Input
+                      id="member-password"
+                      type="password"
+                      autoComplete="new-password"
+                      {...register("password")}
+                    />
+                    {errors.password && (
+                      <p className="field-error">{errors.password.message}</p>
+                    )}
+                  </div>
+                  <div className="field">
+                    <Label htmlFor="member-password-confirmation">
+                      Confirm temporary password
+                    </Label>
+                    <Input
+                      id="member-password-confirmation"
+                      type="password"
+                      autoComplete="new-password"
+                      {...register("password_confirmation")}
+                    />
+                    {errors.password_confirmation && (
+                      <p className="field-error">
+                        {errors.password_confirmation.message}
+                      </p>
+                    )}
+                  </div>
+                  <p className="text-muted-foreground text-sm">
+                    Use 12–72 characters. Share the password privately and ask
+                    the member to change it in their account settings.
+                  </p>
                 </div>
                 {user?.role === "admin" && (
                   <div>
@@ -133,7 +170,7 @@ const AddMemberPage = () => {
                       onValueChange={(value) =>
                         setValue(
                           "role",
-                          value as "admin" | "librarian" | "user"
+                          value as "admin" | "librarian" | "user",
                         )
                       }
                     >
@@ -147,15 +184,15 @@ const AddMemberPage = () => {
                       </SelectContent>
                     </Select>
                     {errors.role && (
-                      <div className="text-xs mt-2 text-destructive">
+                      <div className="text-destructive mt-2 text-xs">
                         <p>{errors.role.message}</p>
                       </div>
                     )}
                   </div>
                 )}
-                <div className="flex items-center justify-end mt-10 gap-5">
+                <div className="mt-10 flex items-center justify-end gap-5">
                   <Button variant={"outline"} asChild>
-                    <Link to={"/members"}>Cancel</Link>
+                    <Link to={"/admin/members"}>Cancel</Link>
                   </Button>
                   <Button type="submit" disabled={isPending}>
                     {!isPending ? (

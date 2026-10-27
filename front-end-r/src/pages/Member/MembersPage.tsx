@@ -47,7 +47,7 @@ export default function MembersPage() {
         description="The people behind every well-read book."
       >
         <Button asChild>
-          <Link to="/members/add">
+          <Link to="/admin/members/add">
             <Plus size={16} />
             Add a member
           </Link>
@@ -124,7 +124,7 @@ export default function MembersPage() {
                   <div className="mt-4 flex flex-wrap gap-2 border-t pt-4">
                     {user?.id === member.id ? (
                       <Button variant="outline" size="sm" asChild>
-                        <Link to="/settings">
+                        <Link to="/admin/settings">
                           <Edit size={14} />
                           Edit profile
                         </Link>
@@ -137,7 +137,7 @@ export default function MembersPage() {
                           asChild
                           aria-label={`Edit ${member.name}`}
                         >
-                          <Link to={`/members/${member.id}/edit`}>
+                          <Link to={`/admin/members/${member.id}/edit`}>
                             <Edit size={14} />
                             Edit member
                           </Link>
@@ -223,7 +223,7 @@ export default function MembersPage() {
                         <div className="flex justify-end gap-1">
                           {user?.id === member.id ? (
                             <Button variant="ghost" size="sm" asChild>
-                              <Link to="/settings">Edit profile</Link>
+                              <Link to="/admin/settings">Edit profile</Link>
                             </Button>
                           ) : (
                             <>
@@ -235,7 +235,7 @@ export default function MembersPage() {
                                 aria-label={`Edit ${member.name}`}
                                 title={`Edit ${member.name}`}
                               >
-                                <Link to={`/members/${member.id}/edit`}>
+                                <Link to={`/admin/members/${member.id}/edit`}>
                                   <Edit size={15} />
                                 </Link>
                               </Button>
@@ -278,7 +278,7 @@ export default function MembersPage() {
               </Button>
             ) : (
               <Button asChild>
-                <Link to="/members/add">Add the first member</Link>
+                <Link to="/admin/members/add">Add the first member</Link>
               </Button>
             )}
           </EmptyState>

@@ -28,7 +28,7 @@ export default function BookPage() {
       <div className="page">
         <PageHeader title="We couldn’t find that book">
           <Button asChild variant="outline">
-            <Link to="/books">
+            <Link to="/admin/books">
               <ArrowLeft size={16} />
               Back to books
             </Link>
@@ -51,7 +51,7 @@ export default function BookPage() {
     <div className="page">
       <PageHeader title={book.title} description={`by ${book.author}`}>
         <Button variant="outline" asChild>
-          <Link to="/books">
+          <Link to="/admin/books">
             <ArrowLeft size={16} />
             Back to collection
           </Link>
@@ -87,7 +87,7 @@ export default function BookPage() {
               {user?.role === "admin" && (
                 <>
                   <Button asChild variant="outline">
-                    <Link to={`/books/${book.id}/edit`}>
+                    <Link to={`/admin/books/${book.id}/edit`}>
                       <Edit size={15} />
                       Edit details
                     </Link>

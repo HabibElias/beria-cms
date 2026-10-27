@@ -59,7 +59,7 @@ export default function BooksPage() {
       >
         {user?.role === "admin" && (
           <Button asChild>
-            <Link to="/books/add">
+            <Link to="/admin/books/add">
               <Plus size={16} />
               Add a book
             </Link>
@@ -212,7 +212,7 @@ export default function BooksPage() {
               </Button>
             ) : user?.role === "admin" ? (
               <Button asChild>
-                <Link to="/books/add">
+                <Link to="/admin/books/add">
                   <Plus size={16} />
                   Add the first book
                 </Link>

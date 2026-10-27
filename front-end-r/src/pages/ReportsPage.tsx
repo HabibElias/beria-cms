@@ -23,17 +23,17 @@ export default function ReportsPage() {
   const available = Math.max(0, books - loans);
   const popular = (data?.popular_books ?? []).filter((row) => row.book);
   const metrics = [
-    { label: "Books in the collection", value: books, link: "/books" },
+    { label: "Books in the collection", value: books, link: "/admin/books" },
     {
       label: "Library members",
       value: data?.total_members ?? 0,
-      link: "/members",
+      link: "/admin/members",
     },
-    { label: "Books on loan", value: loans, link: "/checkouts" },
+    { label: "Books on loan", value: loans, link: "/admin/checkouts" },
     {
       label: "Overdue books",
       value: data?.overdue_books ?? 0,
-      link: "/checkouts?filter=overdue",
+      link: "/admin/checkouts?filter=overdue",
     },
   ];
 
@@ -143,7 +143,7 @@ export default function ReportsPage() {
                         <BookCover book={book} small />
                         <div>
                           <p>
-                            <Link to={`/books/${book.id}`}>{book.title}</Link>
+                            <Link to={`/admin/books/${book.id}`}>{book.title}</Link>
                           </p>
                           <small>{book.author}</small>
                         </div>

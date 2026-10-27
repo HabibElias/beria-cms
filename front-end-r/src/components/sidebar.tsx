@@ -4,6 +4,7 @@ import {
   CalendarDays,
   FolderOpen,
   LayoutDashboard,
+  Inbox,
   Menu,
   Plus,
   Settings,
@@ -28,19 +29,20 @@ import {
 } from "./ui/dialog";
 
 const navigation = [
-  { name: "Overview", href: "/", icon: LayoutDashboard },
-  { name: "Book collection", href: "/books", icon: BookOpen },
-  { name: "Members", href: "/members", icon: Users },
-  { name: "Checkouts & returns", href: "/checkouts", icon: CalendarDays },
-  { name: "Categories", href: "/categories", icon: FolderOpen },
-  { name: "Reports", href: "/reports", icon: BarChart3 },
+  { name: "Overview", href: "/admin", icon: LayoutDashboard },
+  { name: "Book collection", href: "/admin/books", icon: BookOpen },
+  { name: "Members", href: "/admin/members", icon: Users },
+  { name: "Checkouts & returns", href: "/admin/checkouts", icon: CalendarDays },
+  { name: "Loan requests", href: "/admin/loan-requests", icon: Inbox },
+  { name: "Categories", href: "/admin/categories", icon: FolderOpen },
+  { name: "Reports", href: "/admin/reports", icon: BarChart3 },
 ];
 
 function SidebarContent({ close }: { close?: () => void }) {
   const { user } = useAuth();
   return (
     <>
-      <Link to="/" className="sidebar-brand" onClick={close}>
+      <Link to="/admin" className="sidebar-brand" onClick={close}>
         <BrandMark size={45} />
         <span>
           <strong>Berea</strong>
@@ -54,7 +56,7 @@ function SidebarContent({ close }: { close?: () => void }) {
             <NavLink
               key={href}
               to={href}
-              end={href === "/"}
+              end={href === "/admin"}
               onClick={close}
               className={({ isActive }) =>
                 isActive ? "nav-link is-active" : "nav-link"
@@ -69,7 +71,7 @@ function SidebarContent({ close }: { close?: () => void }) {
           <div className="sidebar-shortcut">
             <p className="nav-heading">A little library care</p>
             <Button variant="outline" asChild className="w-full justify-start">
-              <Link to="/books/add" onClick={close}>
+              <Link to="/admin/books/add" onClick={close}>
                 <Plus size={16} />
                 Add a book
               </Link>
@@ -87,8 +89,12 @@ function SidebarContent({ close }: { close?: () => void }) {
         </div>
       </div>
       <div className="sidebar-footer">
+        <Link to="/books" onClick={close} className="nav-link">
+          <BookOpen size={18} strokeWidth={1.7} />
+          Public catalogue
+        </Link>
         <NavLink
-          to="/settings"
+          to="/admin/settings"
           onClick={close}
           className={({ isActive }) =>
             isActive ? "nav-link is-active" : "nav-link"

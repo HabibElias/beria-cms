@@ -13,7 +13,11 @@ export const UserPasswordSchema = z
     new_password: z
       .string()
       .min(12, { message: "New password must be at least 12 characters" })
-      .max(72, { message: "New password must be at most 72 characters" }),
+      .max(72, { message: "New password must be at most 72 characters" })
+      .refine(
+        (value) => new TextEncoder().encode(value).length <= 72,
+        "Password is too long. Please use a shorter password.",
+      ),
     new_password_confirmation: z.string(),
   })
   .refine((data) => data.new_password === data.new_password_confirmation, {

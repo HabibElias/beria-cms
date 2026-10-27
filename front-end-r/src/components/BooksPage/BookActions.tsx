@@ -17,7 +17,7 @@ export default function BookActions({ book }: { book: Book }) {
           size="sm"
           aria-label={`Edit ${book.title}`}
         >
-          <Link to={`/books/${book.id}/edit`}>
+          <Link to={`/admin/books/${book.id}/edit`}>
             <Edit size={15} />
           </Link>
         </Button>

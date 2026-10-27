@@ -10,7 +10,7 @@ export const columns: ColumnDef<Book>[] = [
     header: "Book",
     cell: ({ row }) => (
       <Link
-        to={`/books/${row.original.id}`}
+        to={`/admin/books/${row.original.id}`}
         className="flex items-center gap-3"
       >
         <BookCover book={row.original} small />

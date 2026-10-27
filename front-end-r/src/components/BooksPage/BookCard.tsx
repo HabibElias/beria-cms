@@ -39,7 +39,7 @@ export default function BookCard({ book }: { book: Book }) {
         </span>
       </div>
       <div className="book-card-body">
-        <Link to={`/books/${book.id}`}>{book.title}</Link>
+        <Link to={`/admin/books/${book.id}`}>{book.title}</Link>
         <p className="book-author">{book.author}</p>
         <div className="book-meta">
           <span>{book.category?.name ?? "Uncategorized"}</span>
@@ -54,7 +54,7 @@ export default function BookCard({ book }: { book: Book }) {
             size="sm"
             className="text-primary px-0"
           >
-            <Link to={`/books/${book.id}`}>
+            <Link to={`/admin/books/${book.id}`}>
               View book
               <ArrowRight size={13} />
             </Link>
@@ -70,7 +70,7 @@ export default function BookCard({ book }: { book: Book }) {
                   title={`Edit ${book.title}`}
                   aria-label={`Edit ${book.title}`}
                 >
-                  <Link to={`/books/${book.id}/edit`}>
+                  <Link to={`/admin/books/${book.id}/edit`}>
                     <Edit size={14} />
                   </Link>
                 </Button>

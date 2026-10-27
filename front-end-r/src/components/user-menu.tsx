@@ -42,13 +42,13 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link to="/profile">
+          <Link to="/admin/profile">
             <User size={16} />
             Your profile
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link to="/settings">
+          <Link to="/admin/settings">
             <Settings size={16} />
             Account settings
           </Link>

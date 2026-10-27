@@ -21,7 +21,7 @@ export default function CategoryCard({ cat }: { cat: LibraryCategory }) {
   return (
     <article className="category-card">
       <div className="flex items-start justify-between gap-3">
-        <Link to={`/books?category_id=${cat.id}`} className="category-name">
+        <Link to={`/admin/books?category_id=${cat.id}`} className="category-name">
           {cat.name}
           <ArrowUpRight size={16} />
         </Link>
@@ -55,7 +55,7 @@ export default function CategoryCard({ cat }: { cat: LibraryCategory }) {
         </div>
       </div>
       <p>{cat.description || "A little room for books to belong."}</p>
-      <Link className="category-count" to={`/books?category_id=${cat.id}`}>
+      <Link className="category-count" to={`/admin/books?category_id=${cat.id}`}>
         <span>{cat.book_count ?? 0}</span>{" "}
         {(cat.book_count ?? 0) === 1 ? "book" : "books"}
         <ArrowUpRight size={14} />

@@ -1,5 +1,7 @@
 # Library redesign verification
 
+This records the original brand redesign checks. Current public/member/admin integration checks are described in [member-library.md](member-library.md).
+
 The frontend uses the supplied Berea palette, self-hosted Nunito and Noto Sans Ethiopic, and the icon-only vector conversion described in [brand-assets.md](brand-assets.md).
 
 ## Checks performed

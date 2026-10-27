@@ -25,6 +25,13 @@ interface AuthContextType {
   logout: () => void;
   fetchState: "notReady" | "ready" | "registering" | "logging" | "applying";
   login: (email: string, password: string) => Promise<void>;
+  registerAccount: (attributes: {
+    name: string;
+    email: string;
+    phone: string;
+    password: string;
+    password_confirmation: string;
+  }) => Promise<void>;
   user?: User;
 }
 
@@ -156,9 +163,61 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error(err);
     } finally {
       clearSession();
-      window.location.href = "/login";
+      window.location.href = "/";
     }
   }, [clearSession]);
+
+  const registerAccount = useCallback(
+    async (attributes: {
+      name: string;
+      email: string;
+      phone: string;
+      password: string;
+      password_confirmation: string;
+    }) => {
+      if (loginInFlight.current) return;
+      loginInFlight.current = true;
+      setFetchState("registering");
+      const toastId = toast.loading("Creating your account…");
+      try {
+        const response = await apiClient.post<Response>(
+          "/register",
+          attributes,
+          { timeout: 60_000 },
+        );
+        if (
+          !response.data.status ||
+          !response.data.token ||
+          !response.data.user
+        ) {
+          throw new Error(
+            "The server returned an incomplete account response.",
+          );
+        }
+        setToken(response.data.token);
+        localStorage.setItem("auth_token", response.data.token);
+        apiClient.defaults.headers.common.Authorization = `Bearer ${response.data.token}`;
+        setUser(response.data.user);
+        toast.success("Your account is ready. Welcome to the library!", {
+          id: toastId,
+        });
+      } catch (error) {
+        clearSession();
+        toast.error(
+          isAxiosError(error)
+            ? loginErrorMessage(error)
+                .replace("Sign-in", "Account creation")
+                .replace("sign-in", "account creation")
+            : "We couldn’t create your account. Please try again.",
+          { id: toastId },
+        );
+      } finally {
+        loginInFlight.current = false;
+        setFetchState("ready");
+      }
+    },
+    [clearSession],
+  );
 
   useLayoutEffect(() => {
     if (!mounted && !ref.current) {
@@ -227,7 +286,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       (response) => response,
       async (error: AxiosError) => {
         const originalRequest = error.config as ExtendedAxiosRequestConfig;
-        const isAuthRequest = /\/(login|refresh|logout)(?:\?|$)/.test(
+        const isAuthRequest = /\/(login|register|refresh|logout)(?:\?|$)/.test(
           originalRequest?.url ?? "",
         );
         if (
@@ -285,11 +344,12 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       logout,
       login,
+      registerAccount,
       user,
       fetchState,
       updateUserProfile,
     }),
-    [logout, login, user, fetchState, updateUserProfile],
+    [logout, login, registerAccount, user, fetchState, updateUserProfile],
   );
 
   return (

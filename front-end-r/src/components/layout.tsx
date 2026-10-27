@@ -30,7 +30,7 @@ export default function Layout() {
       </a>
       <Sidebar />
       <header className="workspace-header">
-        <Link to="/" className="mobile-workspace-brand" aria-label="Berea Library home"><BrandMark size={32} /></Link>
+        <Link to="/admin" className="mobile-workspace-brand" aria-label="Berea Library home"><BrandMark size={32} /></Link>
         <p className="workspace-name">
           Berea <span>/</span> <span>Library workspace</span>
         </p>
@@ -39,7 +39,7 @@ export default function Layout() {
           role="search"
           onSubmit={(event) => {
             event.preventDefault();
-            navigate(`/books?q=${encodeURIComponent(query.trim())}`);
+            navigate(`/admin/books?q=${encodeURIComponent(query.trim())}`);
           }}
         >
           <Search size={17} aria-hidden="true" />

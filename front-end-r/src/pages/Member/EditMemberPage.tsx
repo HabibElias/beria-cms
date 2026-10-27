@@ -79,7 +79,7 @@ export default function EditMemberPage() {
   useEffect(() => {
     if (error) {
       toast.error(error.message || "Failed to fetch member");
-      navigate("/members");
+      navigate("/admin/members");
     }
   }, [error, navigate]);
 
@@ -89,7 +89,7 @@ export default function EditMemberPage() {
       {
         onSuccess: () => {
           toast.success("Member updated successfully!");
-          navigate("/members");
+          navigate("/admin/members");
         },
       },
     );
@@ -102,7 +102,7 @@ export default function EditMemberPage() {
     <div className="space-y-6">
       <PageHeader title="Edit member details" description="Update member information">
         <Button variant="outline" asChild>
-          <Link to="/members">
+          <Link to="/admin/members">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Members
           </Link>
@@ -198,7 +198,7 @@ export default function EditMemberPage() {
                 )}
                 <div className="mt-10 flex items-center justify-end gap-5">
                   <Button variant={"outline"} asChild>
-                    <Link to={"/members"}>Cancel</Link>
+                    <Link to={"/admin/members"}>Cancel</Link>
                   </Button>
                   <Button type="submit" disabled={isPending}>
                     {!isPending ? (

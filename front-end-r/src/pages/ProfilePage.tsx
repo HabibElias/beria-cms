@@ -35,7 +35,7 @@ export default function ProfilePage() {
                 : "Library member"}
           </p>
           <Button asChild variant="outline">
-            <Link to="/settings">
+            <Link to="/admin/settings">
               Edit your details
               <ArrowRight size={15} />
             </Link>

@@ -105,7 +105,7 @@ export default function AddBookPage() {
         description="A new story for the shelves. Add its details below."
       >
         <Button variant="outline" asChild>
-          <Link to="/books">
+          <Link to="/admin/books">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Books
           </Link>
@@ -346,7 +346,7 @@ export default function AddBookPage() {
 
                 <div className="flex flex-col-reverse space-y-4 space-y-reverse sm:flex-row sm:justify-end sm:space-x-4 sm:space-y-0">
                   <Button variant="outline" asChild>
-                    <Link to="/books">Cancel</Link>
+                    <Link to="/admin/books">Cancel</Link>
                   </Button>
                   <Button type="submit" disabled={isPending || storeIsPending}>
                     {isPending || storeIsPending ? (

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import type Book from "../models/Book";
 import { cn } from "../lib/utils";
 import { BookOpen } from "lucide-react";
 
@@ -8,20 +7,20 @@ export function BookCover({
   small = false,
   className,
 }: {
-  book: Pick<Book, "title" | "author" | "book_img" | "id">;
+  book: { id: number; title: string; author: string; book_img?: string | null };
   small?: boolean;
   className?: string;
 }) {
-  const [failed, setFailed] = useState(false);
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const classes = cn("book-cover", small && "small", className);
-  if (book.book_img && !failed)
+  if (book.book_img && book.book_img !== failedUrl)
     return (
       <img
         className={classes}
         src={book.book_img}
         alt={`Cover of ${book.title}`}
         loading="lazy"
-        onError={() => setFailed(true)}
+        onError={() => setFailedUrl(book.book_img || null)}
       />
     );
   return (

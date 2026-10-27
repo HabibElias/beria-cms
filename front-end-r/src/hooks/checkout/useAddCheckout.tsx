@@ -23,13 +23,14 @@ const useAddCheckout = () => {
     mutationFn: async ({ data }) => {
       const response = await apiClient.post<AddCheckoutResponse>(
         "/checkouts",
-        data
+        data,
       );
 
       return response.data;
     },
     onError: (error: any) => {
-      if (error.response?.data?.message) toast.error(error.response?.data?.message);
+      if (error.response?.data?.message)
+        toast.error(error.response?.data?.message);
       else if (error.response?.data?.errors) {
         for (const key in error.response?.data?.errors) {
           toast.error(error.response?.data?.errors[key][0]);
@@ -41,6 +42,14 @@ const useAddCheckout = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["analytics"] });
+      for (const key of [
+        "catalogue",
+        "catalogue-book",
+        "my-loans",
+        "my-requests",
+        "admin-loan-requests",
+      ])
+        void queryClient.invalidateQueries({ queryKey: [key] });
       queryClient.invalidateQueries({ queryKey: ["checkouts"] });
       queryClient.invalidateQueries({ queryKey: ["books"] });
     },

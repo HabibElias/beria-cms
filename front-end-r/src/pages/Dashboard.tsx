@@ -50,25 +50,25 @@ export default function Dashboard() {
     {
       label: "Books in the collection",
       value: books,
-      link: "/books",
+      link: "/admin/books",
       action: "Explore the shelves",
     },
     {
       label: "Library members",
       value: data?.total_members ?? 0,
-      link: "/members",
+      link: "/admin/members",
       action: "Meet your readers",
     },
     {
       label: "Books on loan",
       value: loans,
-      link: "/checkouts",
+      link: "/admin/checkouts",
       action: "See current checkouts",
     },
     {
       label: "Overdue books",
       value: data?.overdue_books ?? 0,
-      link: "/checkouts?filter=overdue",
+      link: "/admin/checkouts?filter=overdue",
       action: "Review returns",
     },
   ];
@@ -134,7 +134,7 @@ export default function Dashboard() {
                   {data!.overdue_books === 1 ? "book is" : "books are"} ready
                   for a return reminder.
                 </p>
-                <Link to="/checkouts?filter=overdue">
+                <Link to="/admin/checkouts?filter=overdue">
                   Review overdue
                   <ArrowRight size={14} />
                 </Link>
@@ -147,7 +147,7 @@ export default function Dashboard() {
                     <h2 id="recent-activity">Around the library</h2>
                     <p>Recent checkouts and books welcomed home.</p>
                   </div>
-                  <Link to="/checkouts">
+                  <Link to="/admin/checkouts">
                     View all
                     <ArrowRight size={14} />
                   </Link>
@@ -175,7 +175,7 @@ export default function Dashboard() {
                         <div>
                           <p>
                             {activity.book ? (
-                              <Link to={`/books/${activity.book.id}`}>
+                              <Link to={`/admin/books/${activity.book.id}`}>
                                 {activity.book.title}
                               </Link>
                             ) : (
@@ -232,7 +232,7 @@ export default function Dashboard() {
                       {popular.map(({ book, borrow_count }) => (
                         <Link
                           className="popular-book"
-                          to={`/books/${book.id}`}
+                          to={`/admin/books/${book.id}`}
                           key={book.id}
                         >
                           <BookCover book={book} small />
@@ -307,8 +307,8 @@ export default function Dashboard() {
                     <Link
                       to={
                         books || user?.role !== "admin"
-                          ? "/books"
-                          : "/books/add"
+                          ? "/admin/books"
+                          : "/admin/books/add"
                       }
                     >
                       {books ? "Find the next read" : "Build the collection"}

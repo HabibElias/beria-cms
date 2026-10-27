@@ -108,7 +108,7 @@ export default function UpdateBookPage() {
           setBookImgFile(null);
 
           toast.success("Book updated successfully!");
-          navigate(`/books/${book?.id}`);
+          navigate(`/admin/books/${book?.id}`);
         },
       },
     );
@@ -152,7 +152,7 @@ export default function UpdateBookPage() {
         description="Keep the details ready for the next reader."
       >
         <Button variant="outline" asChild>
-          <Link to="/books">
+          <Link to="/admin/books">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Books
           </Link>
@@ -391,7 +391,7 @@ export default function UpdateBookPage() {
 
                 <div className="flex flex-col-reverse space-y-4 space-y-reverse sm:flex-row sm:justify-end sm:space-y-0 sm:space-x-4">
                   <Button variant="outline" asChild>
-                    <Link to="/books">Cancel</Link>
+                    <Link to="/admin/books">Cancel</Link>
                   </Button>
                   <Button type="submit" disabled={storeIsPending || isPending}>
                     {isPending || storeIsPending ? (
