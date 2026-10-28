@@ -4,5 +4,20 @@
   "installCommand": "npm ci",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/((?!assets/).*)", "destination": "/index.html" }]
+  "headers": [
+    {
+      "source": "/downloads/Berea-Portfolio-Pack.zip",
+      "headers": [
+        {
+          "key": "Content-Disposition",
+          "value": "attachment; filename=\"Berea-Portfolio-Pack.zip\""
+        },
+        { "key": "Content-Type", "value": "application/zip" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/((?!assets/|downloads/).*)", "destination": "/index.html" }
+  ]
 }
