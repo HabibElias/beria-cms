@@ -11,6 +11,14 @@ Use $design-taste-frontend to improve the library dashboard.
 
 The React application is in `front-end-r/`. Run the chosen skill's scripts from that application directory when inspecting or working on its UI. Resolve script paths from the skill directory, which is `../.agents/skills/<skill-name>/` relative to the application.
 
+## Use in the Berea redesign
+
+Impeccable and Taste informed the full library redesign and its public reader/admin extension. The user-supplied Berea guidelines take precedence over generic skill preferences: Covenant Blue, Midnight, Gold and Parchment, the icon-only SVG emblem, and self-hosted Nunito/Noto Sans Ethiopic remain the accepted identity.
+
+The resulting contract is recorded in [DESIGN.md](../front-end-r/DESIGN.md) and [PRODUCT.md](../front-end-r/PRODUCT.md). [Brand provenance](../front-end-r/docs/brand-assets.md) explains the SVG conversion and font licenses. [Reader/admin notes](../front-end-r/docs/member-library.md) describe the integrated routes, permissions and validation.
+
+Visual review covered desktop, tablet, mobile, dark mode and representative loaded/error/empty states. Local review artifacts are ignored by Git; selected 2× captures and presentation boards are available in the [portable portfolio pack](https://beriabooks.vercel.app/downloads/Berea-Portfolio-Pack.zip), using fictional member records. These skills are development tools and are not included as application runtime dependencies.
+
 ## Sources and licenses
 
 - [Impeccable](https://github.com/pbakaus/impeccable): skill version 4.8.0, engine 0.1.18, Apache-2.0 with bundled third-party notices.
